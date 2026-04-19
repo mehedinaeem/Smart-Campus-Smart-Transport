@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="booking-layout">
+    <div class="glass-panel booking-overview">
+        <div class="section-header">
+            <div>
+                <p class="eyebrow">Seat Booking</p>
+                <h3>{{ route_name }}</h3>
+            </div>
+            <span class="status-chip">Boarding Window Open</span>
+        </div>
+        <div class="trip-meta">
+            <div><span>Departure</span><strong>{{ departure }}</strong></div>
+            <div><span>Arrival</span><strong>{{ arrival }}</strong></div>
+            <div><span>Zone</span><strong>North Campus</strong></div>
+        </div>
+
+        <div class="seat-legend">
+            <span><i class="dot available"></i>Available</span>
+            <span><i class="dot premium"></i>Priority</span>
+            <span><i class="dot booked"></i>Booked</span>
+            <span><i class="dot selected"></i>Selected</span>
+        </div>
+
+        <div class="seat-layout" data-seat-layout>
+            {% for seat in seats %}
+            <button
+                class="seat seat-{{ seat.state }}"
+                type="button"
+                {% if seat.state == 'booked' %}disabled{% endif %}
+                data-seat-code="{{ seat.code }}"
+            >
+                {{ seat.code }}
+            </button>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="stack-column">
+        <div class="glass-panel selection-card">
+            <p class="eyebrow">Selection</p>
+            <h3 id="active-seat">Choose a seat</h3>
+            <p>Tap a seat to preview your booking. Premium seats are closest to the front entry for faster boarding.</p>
+            <button class="primary-btn wide-btn" type="button" id="confirm-booking-btn">Confirm Booking</button>
+        </div>
+
+        <div class="glass-panel qr-preview">
+            <p class="eyebrow">Digital Pass</p>
+            <div class="token-card">
+                <div class="qr-grid" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <div>
+                    <strong>Auto-generated QR</strong>
+                    <p>Appears instantly after confirmation for touchless entry.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

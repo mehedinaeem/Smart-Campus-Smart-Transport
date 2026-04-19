@@ -1,12 +1,101 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Bus</title>
-    <link rel="stylesheet" href="/static/css/main.css">
+    <title>{{ page_title }} | Smart Campus Transit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
-<body>
-    {% block content %}{% endblock %}
+<body class="theme-shell">
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <div class="ambient ambient-three"></div>
+
+    <div class="app-shell">
+        <aside class="sidebar glass-panel">
+            <div>
+                <div class="brand-mark">SC</div>
+                <div class="brand-copy">
+                    <h1>Smart Campus</h1>
+                    <p>Transport intelligence</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a class="{% if page_name == 'dashboard' %}active{% endif %}" href="{% url 'student-dashboard' %}">
+                    <span class="nav-icon">◉</span>
+                    Student Dashboard
+                </a>
+                <a class="{% if page_name == 'booking' %}active{% endif %}" href="{% url 'seat-booking' %}">
+                    <span class="nav-icon">▦</span>
+                    Seat Booking
+                </a>
+                <a class="{% if page_name == 'tracking' %}active{% endif %}" href="{% url 'live-tracking' %}">
+                    <span class="nav-icon">⌖</span>
+                    Live Tracking
+                </a>
+                <a class="{% if page_name == 'admin' %}active{% endif %}" href="{% url 'admin-dashboard' %}">
+                    <span class="nav-icon">◫</span>
+                    Admin Dashboard
+                </a>
+                <a class="{% if page_name == 'alerts' %}active{% endif %}" href="{% url 'alerts-monitoring' %}">
+                    <span class="nav-icon">!</span>
+                    Alerts & Monitoring
+                </a>
+            </nav>
+
+            <div class="sidebar-status glass-subpanel">
+                <div class="pulse-dot"></div>
+                <div>
+                    <strong>System Online</strong>
+                    <p>24 buses streaming telemetry</p>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <header class="topbar glass-panel">
+                <div>
+                    <p class="eyebrow">University Smart Transit</p>
+                    <h2>{{ page_title }}</h2>
+                </div>
+                <div class="topbar-actions">
+                    <div class="search-pill">Search route, bus, booking</div>
+                    <button class="primary-btn">Control Center</button>
+                </div>
+            </header>
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <div class="modal-backdrop" id="booking-modal" aria-hidden="true">
+        <div class="booking-modal glass-panel">
+            <div class="modal-header">
+                <p class="eyebrow">Seat Reserved</p>
+                <button class="modal-close" type="button" data-close-modal>&times;</button>
+            </div>
+            <h3>Booking confirmed for <span id="selected-seat-label">B3</span></h3>
+            <p>Your boarding token is now live. Scan the QR at the bus entrance for frictionless access.</p>
+            <div class="token-card">
+                <div class="qr-grid" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <div>
+                    <strong>TOKEN 7X9-Q2A</strong>
+                    <p>Green Line Express • Gate scan enabled</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
