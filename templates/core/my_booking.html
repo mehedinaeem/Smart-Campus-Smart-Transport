@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="booking-layout">
+    <div class="glass-panel booking-overview">
+        <div class="section-header">
+            <div>
+                <p class="eyebrow">My Booking</p>
+                <h3>{{ booking.route }}</h3>
+            </div>
+            <span class="status-chip success">{{ booking.status }}</span>
+        </div>
+
+        <div class="trip-meta">
+            <div><span>Seat</span><strong>{{ booking.seat }}</strong></div>
+            <div><span>Departure</span><strong>{{ booking.departure }}</strong></div>
+            <div><span>Boarding</span><strong>{{ booking.boarding_point }}</strong></div>
+        </div>
+    </div>
+
+    <div class="stack-column">
+        <div class="glass-panel selection-card">
+            <p class="eyebrow">Boarding Token</p>
+            <h3>{{ booking.token }}</h3>
+            <p>Your token is tied to your student booking and can be used at the bus gate scanner.</p>
+        </div>
+
+        <div class="glass-panel qr-preview">
+            <p class="eyebrow">Digital Pass</p>
+            <div class="token-card">
+                <div class="qr-grid" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <div>
+                    <strong>{{ booking.token }}</strong>
+                    <p>Ready for frictionless boarding.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

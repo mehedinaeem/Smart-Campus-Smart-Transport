@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="schedule-layout">
+    <div class="glass-panel alerts-hero">
+        <p class="eyebrow">Driver Workspace</p>
+        <h3>{{ assignment.route }}</h3>
+        <p>{{ assignment.bus_id }} is assigned to your current shift. Keep route timing and telemetry checkpoints in view while driving.</p>
+    </div>
+
+    <section class="schedule-grid">
+        {% for card in checkpoints %}
+        <article class="glass-panel summary-card">
+            <p class="eyebrow">{{ card.label }}</p>
+            <h3>{{ card.value }}</h3>
+            <span>{{ card.detail }}</span>
+        </article>
+        {% endfor %}
+
+        <div class="glass-panel compact-list">
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">Assignment Details</p>
+                    <h3>Driver-specific data</h3>
+                </div>
+            </div>
+            <div class="list-row">
+                <div><strong>Shift Window</strong><p>{{ assignment.shift }}</p></div>
+            </div>
+            <div class="list-row">
+                <div><strong>Supervisor</strong><p>{{ assignment.supervisor }}</p></div>
+            </div>
+            <div class="list-row">
+                <div><strong>Next Stop</strong><p>{{ assignment.next_stop }}</p></div>
+            </div>
+        </div>
+    </section>
+</section>
+{% endblock %}

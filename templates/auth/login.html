@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="auth-layout">
+    <div class="glass-panel auth-card">
+        <p class="eyebrow">Welcome Back</p>
+        <h3>Login</h3>
+        <p>Use your account to continue to bookings, driver workspace, or admin tools.</p>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="message-banner message-error">{{ form.non_field_errors|striptags }}</div>
+            {% endif %}
+
+            {% for field in form %}
+            <div class="auth-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <small class="field-error">{{ field.errors|striptags }}</small>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            {% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% endif %}
+
+            <button class="primary-btn wide-btn" type="submit">Login</button>
+        </form>
+
+        <p class="auth-meta">New student? <a href="{% url 'signup' %}">Create a student account</a></p>
+    </div>
+</section>
+{% endblock %}
