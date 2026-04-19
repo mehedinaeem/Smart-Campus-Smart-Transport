@@ -1,10 +1,37 @@
 (function () {
+    const body = document.body;
     const authTrigger = document.querySelector("[data-auth-trigger]");
     const authMenu = document.querySelector("[data-auth-menu]");
+    const mobileMenuToggle = document.querySelector("[data-mobile-menu-toggle]");
+    const mobileMenuClose = document.querySelector("[data-mobile-menu-close]");
+    const mobileMenuBackdrop = document.querySelector("[data-mobile-menu-backdrop]");
+    const mobileDrawer = document.querySelector("[data-mobile-drawer]");
+    const mobileNavLinks = document.querySelectorAll(".sidebar-nav a");
 
     authTrigger?.addEventListener("click", () => {
         const willOpen = authMenu?.hasAttribute("hidden");
         setAuthMenuOpen(Boolean(willOpen));
+    });
+
+    mobileMenuToggle?.addEventListener("click", () => {
+        const open = !body.classList.contains("mobile-menu-open");
+        setMobileMenuOpen(open);
+    });
+
+    mobileMenuClose?.addEventListener("click", () => {
+        setMobileMenuOpen(false);
+    });
+
+    mobileMenuBackdrop?.addEventListener("click", () => {
+        setMobileMenuOpen(false);
+    });
+
+    mobileNavLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+            if (window.innerWidth <= 760) {
+                setMobileMenuOpen(false);
+            }
+        });
     });
 
     document.addEventListener("click", (event) => {
@@ -20,6 +47,7 @@
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
             setAuthMenuOpen(false);
+            setMobileMenuOpen(false);
         }
     });
 
@@ -36,6 +64,28 @@
 
         authTrigger.setAttribute("aria-expanded", open ? "true" : "false");
     }
+
+    function setMobileMenuOpen(open) {
+        if (!mobileDrawer || !mobileMenuToggle || !mobileMenuBackdrop) {
+            return;
+        }
+
+        body.classList.toggle("mobile-menu-open", open);
+        mobileMenuToggle.setAttribute("aria-expanded", open ? "true" : "false");
+        mobileDrawer.setAttribute("aria-hidden", open ? "false" : "true");
+
+        if (open) {
+            mobileMenuBackdrop.removeAttribute("hidden");
+        } else {
+            mobileMenuBackdrop.setAttribute("hidden", "hidden");
+        }
+    }
+
+    window.addEventListener("resize", () => {
+        if (window.innerWidth > 760) {
+            setMobileMenuOpen(false);
+        }
+    });
 
     const seats = document.querySelectorAll(".seat-layout .seat:not(:disabled)");
     const activeSeatLabel = document.getElementById("active-seat");
