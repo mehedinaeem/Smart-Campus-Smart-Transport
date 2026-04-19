@@ -1,5 +1,13 @@
 from django.shortcuts import render
 
+from apps.core.decorators import role_required
+
+
+@role_required(
+    "admin",
+    login_message="Please login to access alerts and monitoring.",
+    denied_message="Admin access is required for alerts and monitoring.",
+)
 def alerts_monitoring_view(request):
     context = {
         "page_title": "Alerts & Monitoring",

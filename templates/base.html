@@ -19,8 +19,7 @@
     <div class="ambient ambient-two"></div>
     <div class="ambient ambient-three"></div>
 
-    <div class="app-shell" data-page-name="{{ page_name|default:'dashboard' }}"
-        data-default-role="{% if page_name == 'admin' or page_name == 'alerts' or page_name == 'analytics' %}admin{% else %}student{% endif %}">
+    <div class="app-shell">
         <aside class="sidebar glass-panel">
             <div>
                 <div class="brand-mark">SC</div>
@@ -30,7 +29,7 @@
                 </div>
             </div>
 
-            <nav class="sidebar-nav sidebar-nav-single" aria-label="Application navigation">
+            <nav class="sidebar-nav" aria-label="Application navigation">
                 <a class="{% if page_name == 'dashboard' %}active{% endif %}" href="{% url 'student-dashboard' %}">
                     <span class="nav-icon">H</span>
                     Home
@@ -39,29 +38,49 @@
                     <span class="nav-icon">L</span>
                     Live Tracking
                 </a>
+
+                {% if not is_driver %}
                 <a class="{% if page_name == 'schedule' %}active{% endif %}" href="{% url 'bus-schedule' %}">
                     <span class="nav-icon">B</span>
                     Bus Schedule
                 </a>
+                {% endif %}
+
+                {% if not request.user.is_authenticated or is_student %}
                 <a class="{% if page_name == 'booking' %}active{% endif %}" href="{% url 'seat-booking' %}">
                     <span class="nav-icon">S</span>
                     Seat Booking
                 </a>
-                <a class="admin-nav-item {% if page_name == 'admin' %}active{% endif %}"
-                    href="{% url 'admin-dashboard' %}" data-admin-item>
+                {% endif %}
+
+                {% if is_student %}
+                <a class="{% if page_name == 'my-booking' %}active{% endif %}" href="{% url 'my-booking' %}">
+                    <span class="nav-icon">M</span>
+                    My Booking
+                </a>
+                {% endif %}
+
+                {% if is_driver %}
+                <a class="{% if page_name == 'driver-dashboard' %}active{% endif %}" href="{% url 'driver-dashboard' %}">
+                    <span class="nav-icon">R</span>
+                    My Assigned Route
+                </a>
+                {% endif %}
+
+                {% if is_admin_user %}
+                <a class="{% if page_name == 'admin' %}active{% endif %}" href="{% url 'admin-dashboard' %}">
                     <span class="nav-icon">D</span>
                     Admin Dashboard
                 </a>
-                <a class="admin-nav-item {% if page_name == 'alerts' %}active{% endif %}"
-                    href="{% url 'alerts-monitoring' %}" data-admin-item>
+                <a class="{% if page_name == 'alerts' %}active{% endif %}" href="{% url 'alerts-monitoring' %}">
                     <span class="nav-icon">A</span>
                     Alerts &amp; Monitoring
                 </a>
-                <a class="admin-nav-item {% if page_name == 'analytics' %}active{% endif %}"
-                    href="{% url 'analytics' %}" data-admin-item>
+                <a class="{% if page_name == 'analytics' %}active{% endif %}" href="{% url 'analytics' %}">
                     <span class="nav-icon">N</span>
                     Analytics
                 </a>
+                {% endif %}
             </nav>
 
             <div class="sidebar-status glass-subpanel">
@@ -81,50 +100,55 @@
                 </div>
                 <div class="topbar-actions">
                     <div class="search-pill">Search route, bus, booking</div>
-                    <div class="auth-shell" data-auth-shell>
-                        <button class="login-btn" type="button" data-auth-trigger aria-expanded="false">
-                            <span class="login-btn__icon" aria-hidden="true"></span>
-                            <span class="login-btn__label" data-auth-label>Login</span>
-                            <span class="login-btn__avatar" data-auth-avatar hidden>S</span>
+
+                    {% if request.user.is_authenticated %}
+                    <div class="auth-shell">
+                        <button class="login-btn is-logged-in" type="button" data-auth-trigger aria-expanded="false">
+                            <span class="login-btn__avatar">
+                                {% if request.user.first_name %}{{ request.user.first_name|first|upper }}{% else %}{{ request.user.username|first|upper }}{% endif %}
+                            </span>
                         </button>
                         <div class="auth-menu glass-subpanel" data-auth-menu hidden>
-                            <div class="auth-panel auth-login-panel is-active" data-auth-panel="logged-out">
-                                <p class="eyebrow">Quick Access</p>
-                                <h3>Choose your workspace</h3>
-                                <p>Switch the homepage between student and admin experiences while preserving the
-                                    current design language.</p>
-                                <button class="auth-option" type="button" data-login-role="student">
-                                    <span class="auth-option__icon">S</span>
-                                    <span>
-                                        <strong>Login as Student</strong>
-                                        <small>Focused on tracking, schedules, and seat booking</small>
-                                    </span>
-                                </button>
-                                <button class="auth-option" type="button" data-login-role="admin">
-                                    <span class="auth-option__icon">A</span>
-                                    <span>
-                                        <strong>Login as Admin</strong>
-                                        <small>Unlock alerts, analytics, and operations control</small>
-                                    </span>
-                                </button>
-                            </div>
-
-                            <div class="auth-panel" data-auth-panel="logged-in">
+                            <div class="auth-panel is-active">
                                 <div class="profile-card">
-                                    <div class="profile-avatar" data-profile-avatar>S</div>
+                                    <div class="profile-avatar">
+                                        {% if request.user.first_name %}{{ request.user.first_name|first|upper }}{% else %}{{ request.user.username|first|upper }}{% endif %}
+                                    </div>
                                     <div>
-                                        <strong data-profile-name>Student User</strong>
-                                        <p data-profile-role>Student Access</p>
+                                        <strong>{% if request.user.get_full_name %}{{ request.user.get_full_name }}{% else %}{{ request.user.username }}{% endif %}</strong>
+                                        <p>{{ user_role|title }} access</p>
                                     </div>
                                 </div>
-                                <a class="profile-link" href="#" data-switch-role="student">Switch to Student View</a>
-                                <a class="profile-link" href="#" data-switch-role="admin">Switch to Admin View</a>
-                                <button class="logout-btn" type="button" data-logout>Logout</button>
+                                {% if is_student %}
+                                <a class="profile-link" href="{% url 'my-booking' %}">My Booking</a>
+                                {% elif is_driver %}
+                                <a class="profile-link" href="{% url 'driver-dashboard' %}">My Assigned Route</a>
+                                {% elif is_admin_user %}
+                                <a class="profile-link" href="{% url 'admin-dashboard' %}">Admin Workspace</a>
+                                {% endif %}
+                                <form method="post" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button class="logout-btn" type="submit">Logout</button>
+                                </form>
                             </div>
                         </div>
                     </div>
+                    {% else %}
+                    <a class="login-btn" href="{% url 'login' %}">
+                        <span class="login-btn__icon" aria-hidden="true"></span>
+                        <span class="login-btn__label">Login</span>
+                    </a>
+                    {% endif %}
                 </div>
             </header>
+
+            {% if messages %}
+            <section class="messages-stack">
+                {% for message in messages %}
+                <div class="message-banner message-{{ message.tags|default:'info' }}">{{ message }}</div>
+                {% endfor %}
+            </section>
+            {% endif %}
 
             {% block content %}{% endblock %}
         </main>
