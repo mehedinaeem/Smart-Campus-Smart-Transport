@@ -24,7 +24,7 @@ def bus_schedule_view(request):
         "route_notes": [
             "Seat reservations open 10 minutes before each departure window.",
             "Boarding zones are color-matched with the route label for faster wayfinding.",
-            "Admins can still reach monitoring and analytics after switching role from the top-right profile menu.",
+            "Login unlocks student booking tools or role-specific workspaces based on your account.",
         ],
     }
     return render(request, "routing/bus_schedule.html", context)

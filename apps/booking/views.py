@@ -1,5 +1,11 @@
+from apps.core.decorators import role_required
 from django.shortcuts import render
 
+@role_required(
+    "student",
+    login_message="Please login to book a seat.",
+    denied_message="Seat booking is available for student accounts only.",
+)
 def seat_booking_view(request):
     seats = []
     booked = {"A2", "A4", "B1", "B5", "C3", "C4", "D2", "D6"}

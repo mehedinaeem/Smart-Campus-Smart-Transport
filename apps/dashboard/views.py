@@ -1,5 +1,13 @@
 from django.shortcuts import render
 
+from apps.core.decorators import role_required
+
+
+@role_required(
+    "admin",
+    login_message="Please login to access the admin dashboard.",
+    denied_message="Admin access is required for this page.",
+)
 def admin_dashboard_view(request):
     context = {
         "page_title": "Admin Dashboard",
@@ -20,6 +28,11 @@ def admin_dashboard_view(request):
     return render(request, "dashboard/admin_dashboard.html", context)
 
 
+@role_required(
+    "admin",
+    login_message="Please login to access analytics.",
+    denied_message="Admin access is required for analytics.",
+)
 def analytics_view(request):
     context = {
         "page_title": "Analytics",
