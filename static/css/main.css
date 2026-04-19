@@ -152,6 +152,10 @@ body {
     margin: 32px 0 auto;
 }
 
+.sidebar-nav-single {
+    position: relative;
+}
+
 .sidebar-nav a {
     display: flex;
     align-items: center;
@@ -171,11 +175,37 @@ body {
     transform: translateX(3px);
 }
 
+.admin-nav-item {
+    max-height: 64px;
+    opacity: 1;
+    overflow: hidden;
+    transition: opacity 0.28s ease, transform 0.28s ease, max-height 0.28s ease, margin 0.28s ease, padding 0.28s ease;
+}
+
+.sidebar-nav.is-student .admin-nav-item {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-8px);
+    max-height: 0;
+    margin: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-width: 0;
+}
+
 .nav-icon {
-    display: inline-grid;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     place-items: center;
-    width: 24px;
-    color: var(--primary);
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    color: #d7e8ff;
+    font-size: 0.78rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, rgba(97, 168, 255, 0.22), rgba(159, 123, 255, 0.26));
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-status {
@@ -246,6 +276,215 @@ body {
 .primary-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 18px 36px rgba(97, 168, 255, 0.32);
+}
+
+.auth-shell {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.login-btn,
+.logout-btn,
+.auth-option {
+    font: inherit;
+}
+
+.login-btn {
+    display: inline-flex;
+    align-items: center;
+    /* text-align: center; */
+    gap: 10px;
+    min-height: 44px;
+    min-width: 116px;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text);
+    cursor: pointer;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(97, 168, 255, 0.12));
+    box-shadow: 0 10px 24px rgba(4, 10, 22, 0.22);
+    transition: background 0.24s ease, border-color 0.24s ease, box-shadow 0.24s ease, transform 0.24s ease;
+}
+
+.login-btn:hover,
+.login-btn[aria-expanded="true"] {
+    transform: translateY(-2px);
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(97, 168, 255, 0.18));
+    box-shadow: 0 14px 28px rgba(10, 22, 45, 0.34);
+    border-color: rgba(97, 168, 255, 0.28);
+}
+
+.login-btn.is-logged-in {
+    min-width: 44px;
+    width: 44px;
+    padding: 4px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.login-btn__icon {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.login-btn__icon::before,
+.login-btn__icon::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 1.6px solid rgba(239, 245, 255, 0.92);
+}
+
+.login-btn__icon::before {
+    top: 0;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+}
+
+.login-btn__icon::after {
+    bottom: 0;
+    width: 13px;
+    height: 8px;
+    border-radius: 999px 999px 6px 6px;
+    border-top: 0;
+}
+
+.login-btn__label {
+    font-size: 0.94rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.login-btn__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: white;
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    box-shadow: 0 8px 18px rgba(97, 168, 255, 0.24);
+}
+
+.login-btn.is-logged-in .login-btn__icon,
+.login-btn.is-logged-in .login-btn__label {
+    display: none;
+}
+
+.auth-menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: min(320px, calc(100vw - 32px));
+    padding: 14px;
+    z-index: 12;
+}
+
+.auth-panel {
+    display: none;
+    gap: 12px;
+}
+
+.auth-panel.is-active {
+    display: grid;
+}
+
+.auth-panel h3 {
+    margin: -2px 0 0;
+    font-family: "Space Grotesk", sans-serif;
+}
+
+.auth-panel p {
+    margin: 0;
+    color: var(--muted);
+}
+
+.auth-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.04);
+    transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.auth-option:hover,
+.profile-link:hover,
+.logout-btn:hover {
+    transform: translateY(-2px);
+}
+
+.auth-option:hover {
+    border-color: rgba(97, 168, 255, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.auth-option__icon,
+.profile-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    background: linear-gradient(135deg, rgba(97, 168, 255, 0.24), rgba(159, 123, 255, 0.28));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-option small {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+}
+
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 4px 6px;
+}
+
+.profile-link,
+.logout-btn {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    text-decoration: none;
+    transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.profile-link:hover,
+.logout-btn:hover {
+    border-color: rgba(97, 168, 255, 0.28);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.logout-btn {
+    cursor: pointer;
 }
 
 .wide-btn {
@@ -671,6 +910,19 @@ th {
     gap: 24px;
 }
 
+.schedule-layout,
+.insight-layout {
+    display: grid;
+    gap: 24px;
+}
+
+.schedule-grid,
+.insight-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
 .alerts-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -745,7 +997,9 @@ th {
     .summary-grid,
     .analytics-grid,
     .dashboard-strip,
-    .alerts-grid {
+    .alerts-grid,
+    .schedule-grid,
+    .insight-grid {
         grid-template-columns: 1fr;
     }
 
@@ -781,7 +1035,13 @@ th {
     }
 
     .search-pill,
-    .primary-btn {
+    .primary-btn,
+    .login-btn,
+    .auth-shell {
+        width: 100%;
+    }
+
+    .auth-menu {
         width: 100%;
     }
 

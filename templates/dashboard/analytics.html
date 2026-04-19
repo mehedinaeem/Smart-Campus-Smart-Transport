@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="insight-layout">
+    <div class="glass-panel alerts-hero">
+        <p class="eyebrow">Operations Intelligence</p>
+        <h3>Analytics for route planning and fleet health</h3>
+        <p>Admin users get a clearer system view with fast-read KPIs, risk notes, and trend context in the same visual language as the rest of the product.</p>
+    </div>
+
+    <section class="insight-grid">
+        {% for card in insight_cards %}
+        <article class="glass-panel summary-card">
+            <p class="eyebrow">{{ card.label }}</p>
+            <h3>{{ card.value }}</h3>
+            <span>{{ card.detail }}</span>
+        </article>
+        {% endfor %}
+
+        <div class="glass-panel compact-list">
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">Signals</p>
+                    <h3>Admin-only highlights</h3>
+                </div>
+            </div>
+            {% for row in insight_rows %}
+            <div class="list-row">
+                <div>
+                    <strong>{{ row.title }}</strong>
+                    <p>{{ row.detail }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="glass-panel chart-panel">
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">Ridership Pattern</p>
+                    <h3>Demand curve snapshot</h3>
+                </div>
+            </div>
+            <canvas id="usageChart" height="180"></canvas>
+        </div>
+
+        <div class="glass-panel chart-panel">
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">Resource Balance</p>
+                    <h3>Fuel and energy mix</h3>
+                </div>
+            </div>
+            <canvas id="fuelChart" height="180"></canvas>
+        </div>
+    </section>
+</section>
+{% endblock %}

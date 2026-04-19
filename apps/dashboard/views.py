@@ -18,3 +18,21 @@ def admin_dashboard_view(request):
         ],
     }
     return render(request, "dashboard/admin_dashboard.html", context)
+
+
+def analytics_view(request):
+    context = {
+        "page_title": "Analytics",
+        "page_name": "analytics",
+        "insight_cards": [
+            {"label": "Avg Occupancy", "value": "74%", "detail": "Morning peak remains the busiest period"},
+            {"label": "On-Time Rate", "value": "93.4%", "detail": "Up 4.1% over last week"},
+            {"label": "Alert Resolution", "value": "18 min", "detail": "Mean response time across active routes"},
+        ],
+        "insight_rows": [
+            {"title": "Route Demand", "detail": "North Loop and Dorm Express are driving most seat bookings this week."},
+            {"title": "Fuel Efficiency", "detail": "Electric fleet zones show the strongest efficiency during afternoon rotations."},
+            {"title": "Operational Risk", "detail": "Two congestion clusters are affecting the Medical Shuttle corridor."},
+        ],
+    }
+    return render(request, "dashboard/analytics.html", context)

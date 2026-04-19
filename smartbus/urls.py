@@ -18,8 +18,9 @@ from django.contrib import admin
 from django.urls import path
 from apps.booking.views import seat_booking_view
 from apps.core.views import student_dashboard_view
-from apps.dashboard.views import admin_dashboard_view
+from apps.dashboard.views import admin_dashboard_view, analytics_view
 from apps.fuel.views import alerts_monitoring_view
+from apps.routing.views import bus_schedule_view
 from apps.tracking.views import live_tracking_view
 
 urlpatterns = [
@@ -27,6 +28,8 @@ urlpatterns = [
     path('', student_dashboard_view, name='student-dashboard'),
     path('booking/', seat_booking_view, name='seat-booking'),
     path('tracking/', live_tracking_view, name='live-tracking'),
+    path('schedule/', bus_schedule_view, name='bus-schedule'),
     path('admin/', admin_dashboard_view, name='admin-dashboard'),
     path('alerts/', alerts_monitoring_view, name='alerts-monitoring'),
+    path('analytics/', analytics_view, name='analytics'),
 ]
