@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="auth-layout">
+    <div class="glass-panel auth-card">
+        <p class="eyebrow">Student Registration</p>
+        <h3>Create your account</h3>
+        <p>Public signup is available for students only. Driver and admin accounts are created internally.</p>
+
+        <form method="post" class="auth-form auth-form-grid">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="message-banner message-error">{{ form.non_field_errors|striptags }}</div>
+            {% endif %}
+
+            {% for field in form %}
+            <div class="auth-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <small class="field-error">{{ field.errors|striptags }}</small>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button class="primary-btn wide-btn" type="submit">Create Student Account</button>
+        </form>
+
+        <p class="auth-meta">Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+    </div>
+</section>
+{% endblock %}

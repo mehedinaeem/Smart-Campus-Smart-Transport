@@ -16,7 +16,32 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from apps.booking.views import seat_booking_view
+from apps.core.views import (
+    RoleAwareLoginView,
+    RoleAwareLogoutView,
+    StudentSignupView,
+    driver_dashboard_view,
+    my_booking_view,
+    student_dashboard_view,
+)
+from apps.dashboard.views import admin_dashboard_view, analytics_view
+from apps.fuel.views import alerts_monitoring_view
+from apps.routing.views import bus_schedule_view
+from apps.tracking.views import live_tracking_view
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('system-admin/', admin.site.urls),
+    path('', student_dashboard_view, name='student-dashboard'),
+    path('login/', RoleAwareLoginView.as_view(), name='login'),
+    path('logout/', RoleAwareLogoutView.as_view(), name='logout'),
+    path('signup/', StudentSignupView.as_view(), name='signup'),
+    path('booking/', seat_booking_view, name='seat-booking'),
+    path('my-booking/', my_booking_view, name='my-booking'),
+    path('tracking/', live_tracking_view, name='live-tracking'),
+    path('driver/', driver_dashboard_view, name='driver-dashboard'),
+    path('schedule/', bus_schedule_view, name='bus-schedule'),
+    path('admin/', admin_dashboard_view, name='admin-dashboard'),
+    path('alerts/', alerts_monitoring_view, name='alerts-monitoring'),
+    path('analytics/', analytics_view, name='analytics'),
 ]

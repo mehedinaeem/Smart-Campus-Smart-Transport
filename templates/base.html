@@ -1,12 +1,230 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Bus</title>
-    <link rel="stylesheet" href="/static/css/main.css">
+    <title>{{ page_title }} | Smart Campus Transit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
-<body>
-    {% block content %}{% endblock %}
+
+<body class="theme-shell">
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <div class="ambient ambient-three"></div>
+
+    <div class="mobile-topbar glass-panel">
+        <a class="mobile-brand" href="{% url 'student-dashboard' %}">
+            <span class="brand-mark">SC</span>
+            <span class="mobile-brand__copy">
+                <strong>Smart Campus</strong>
+            </span>
+        </a>
+        <div class="mobile-topbar__actions">
+            <button class="mobile-menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" data-mobile-menu-toggle>
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </div>
+
+    <div class="mobile-menu-backdrop" data-mobile-menu-backdrop hidden></div>
+
+    <div class="app-shell">
+        <aside class="sidebar glass-panel" data-mobile-drawer>
+            <div class="sidebar-mobile-bar">
+                <div class="sidebar-mobile-brand">
+                    <div class="brand-mark">SC</div>
+                    <div class="brand-copy">
+                        <h1>Smart Campus</h1>
+                        <p>Transport intelligence</p>
+                    </div>
+                </div>
+                <button class="sidebar-close-btn" type="button" aria-label="Close navigation menu" data-mobile-menu-close>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+            <div class="sidebar-brand-block">
+                <div class="brand-mark">SC</div>
+                <div class="brand-copy">
+                    <h1>Smart Campus</h1>
+                    <p>Transport intelligence</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav" aria-label="Application navigation">
+                <a class="{% if page_name == 'dashboard' %}active{% endif %}" href="{% url 'student-dashboard' %}">
+                    <span class="nav-icon">H</span>
+                    Home
+                </a>
+                <a class="{% if page_name == 'tracking' %}active{% endif %}" href="{% url 'live-tracking' %}">
+                    <span class="nav-icon">L</span>
+                    Live Tracking
+                </a>
+
+                {% if not is_driver %}
+                <a class="{% if page_name == 'schedule' %}active{% endif %}" href="{% url 'bus-schedule' %}">
+                    <span class="nav-icon">B</span>
+                    Bus Schedule
+                </a>
+                {% endif %}
+
+                {% if not request.user.is_authenticated or is_student %}
+                <a class="{% if page_name == 'booking' %}active{% endif %}" href="{% url 'seat-booking' %}">
+                    <span class="nav-icon">S</span>
+                    Seat Booking
+                </a>
+                {% endif %}
+
+                {% if is_student %}
+                <a class="{% if page_name == 'my-booking' %}active{% endif %}" href="{% url 'my-booking' %}">
+                    <span class="nav-icon">M</span>
+                    My Booking
+                </a>
+                {% endif %}
+
+                {% if is_driver %}
+                <a class="{% if page_name == 'driver-dashboard' %}active{% endif %}" href="{% url 'driver-dashboard' %}">
+                    <span class="nav-icon">R</span>
+                    My Assigned Route
+                </a>
+                {% endif %}
+
+                {% if is_admin_user %}
+                <a class="{% if page_name == 'admin' %}active{% endif %}" href="{% url 'admin-dashboard' %}">
+                    <span class="nav-icon">D</span>
+                    Admin Dashboard
+                </a>
+                <a class="{% if page_name == 'alerts' %}active{% endif %}" href="{% url 'alerts-monitoring' %}">
+                    <span class="nav-icon">A</span>
+                    Alerts &amp; Monitoring
+                </a>
+                <a class="{% if page_name == 'analytics' %}active{% endif %}" href="{% url 'analytics' %}">
+                    <span class="nav-icon">N</span>
+                    Analytics
+                </a>
+                {% endif %}
+            </nav>
+
+            {% if is_admin_user %}
+            <a class="mobile-drawer-cta primary-btn" href="{% url 'admin-dashboard' %}">Open Admin Desk</a>
+            {% elif is_driver %}
+            <a class="mobile-drawer-cta primary-btn" href="{% url 'driver-dashboard' %}">Open Route Desk</a>
+            {% elif request.user.is_authenticated %}
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="mobile-drawer-cta primary-btn" type="submit">Logout</button>
+            </form>
+            {% else %}
+            <div class="mobile-drawer-auth-actions">
+                <a class="mobile-drawer-cta primary-btn" href="{% url 'login' %}">Login</a>
+                <a class="mobile-drawer-secondary" href="{% url 'signup' %}">Create Account</a>
+            </div>
+            {% endif %}
+
+            <div class="sidebar-status glass-subpanel">
+                <div class="pulse-dot"></div>
+                <div>
+                    <strong>System Online</strong>
+                    <p>24 buses streaming telemetry</p>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <header class="topbar glass-panel">
+                <div>
+                    <p class="eyebrow">University Smart Transit</p>
+                    <h2>{{ page_title }}</h2>
+                </div>
+                <div class="topbar-actions">
+                    <div class="search-pill">Search route, bus, booking</div>
+
+                    {% if request.user.is_authenticated %}
+                    <div class="auth-shell">
+                        <button class="login-btn is-logged-in" type="button" data-auth-trigger aria-expanded="false">
+                            <span class="login-btn__avatar">
+                                {% if request.user.first_name %}{{ request.user.first_name|first|upper }}{% else %}{{ request.user.username|first|upper }}{% endif %}
+                            </span>
+                        </button>
+                        <div class="auth-menu glass-subpanel" data-auth-menu hidden>
+                            <div class="auth-panel is-active">
+                                <div class="profile-card">
+                                    <div class="profile-avatar">
+                                        {% if request.user.first_name %}{{ request.user.first_name|first|upper }}{% else %}{{ request.user.username|first|upper }}{% endif %}
+                                    </div>
+                                    <div>
+                                        <strong>{% if request.user.get_full_name %}{{ request.user.get_full_name }}{% else %}{{ request.user.username }}{% endif %}</strong>
+                                        <p>{{ user_role|title }} access</p>
+                                    </div>
+                                </div>
+                                {% if is_student %}
+                                <a class="profile-link" href="{% url 'my-booking' %}">My Booking</a>
+                                {% elif is_driver %}
+                                <a class="profile-link" href="{% url 'driver-dashboard' %}">My Assigned Route</a>
+                                {% elif is_admin_user %}
+                                <a class="profile-link" href="{% url 'admin-dashboard' %}">Admin Workspace</a>
+                                {% endif %}
+                                <form method="post" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button class="logout-btn" type="submit">Logout</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a class="login-btn" href="{% url 'login' %}">
+                        <span class="login-btn__icon" aria-hidden="true"></span>
+                        <span class="login-btn__label">Login</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </header>
+
+            {% if messages %}
+            <section class="messages-stack">
+                {% for message in messages %}
+                <div class="message-banner message-{{ message.tags|default:'info' }}">{{ message }}</div>
+                {% endfor %}
+            </section>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <div class="modal-backdrop" id="booking-modal" aria-hidden="true">
+        <div class="booking-modal glass-panel">
+            <div class="modal-header">
+                <p class="eyebrow">Seat Reserved</p>
+                <button class="modal-close" type="button" data-close-modal>&times;</button>
+            </div>
+            <h3>Booking confirmed for <span id="selected-seat-label">B3</span></h3>
+            <p>Your boarding token is now live. Scan the QR at the bus entrance for frictionless access.</p>
+            <div class="token-card">
+                <div class="qr-grid" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <div>
+                    <strong>TOKEN 7X9-Q2A</strong>
+                    <p>Green Line Express &bull; Gate scan enabled</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
 </body>
+
 </html>
