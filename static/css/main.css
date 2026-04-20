@@ -1491,6 +1491,12 @@ th {
     .dashboard-strip,
     .alerts-grid,
     .schedule-grid,
+    .schedule-hero,
+    .schedule-vehicle-grid,
+    .schedule-route-grid,
+    .schedule-footer,
+    .role-admin-hero,
+    .role-admin-summary,
     .insight-grid {
         grid-template-columns: 1fr;
     }
@@ -1715,6 +1721,42 @@ th {
     .analytics-grid,
     .trips-panel {
         min-width: 0;
+    }
+
+    .schedule-section-panel,
+    .schedule-hero,
+    .schedule-vehicle-card,
+    .schedule-footer,
+    .role-admin-panel,
+    .role-admin-hero {
+        padding: 20px;
+    }
+
+    .role-admin-header {
+        margin-bottom: 18px;
+    }
+
+    .role-search-form {
+        width: 100%;
+    }
+
+    .role-admin-table {
+        display: none;
+    }
+
+    .role-card-list {
+        display: grid;
+        gap: 16px;
+    }
+
+    .role-inline-form {
+        display: grid;
+        align-items: stretch;
+    }
+
+    .role-select,
+    .role-update-btn {
+        width: 100%;
     }
 
     .seat-layout {
