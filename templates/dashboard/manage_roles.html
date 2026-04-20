@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="role-admin-layout">
+    <div class="glass-panel role-admin-hero">
+        <div>
+            <p class="eyebrow">Admin Control</p>
+            <h3>Manage Driver Roles</h3>
+            <p>Assign driver access to existing users, or switch driver accounts back to student access from the dashboard workspace.</p>
+        </div>
+        <span class="status-chip">Admin Only</span>
+    </div>
+
+    <section class="role-admin-summary">
+        <article class="glass-panel summary-card">
+            <p class="eyebrow">Total Users</p>
+            <h3>{{ user_summary.total }}</h3>
+            <span>All registered accounts</span>
+        </article>
+        <article class="glass-panel summary-card">
+            <p class="eyebrow">Drivers</p>
+            <h3>{{ user_summary.drivers }}</h3>
+            <span>Accounts with route desk access</span>
+        </article>
+        <article class="glass-panel summary-card">
+            <p class="eyebrow">Students</p>
+            <h3>{{ user_summary.students }}</h3>
+            <span>Standard booking users</span>
+        </article>
+    </section>
+
+    <section class="glass-panel role-admin-panel">
+        <div class="section-header role-admin-header">
+            <div>
+                <p class="eyebrow">User Management</p>
+                <h3>Assign or update roles</h3>
+            </div>
+            <form class="role-search-form" method="get">
+                <input class="auth-input" type="search" name="q" value="{{ search_query }}" placeholder="Search username, email, or name">
+            </form>
+        </div>
+
+        <div class="table-shell role-admin-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Current Role</th>
+                        <th>Update Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for account in managed_users %}
+                    <tr>
+                        <td>{{ account.username }}</td>
+                        <td>{% if account.full_name %}{{ account.full_name }}{% else %}Not provided{% endif %}</td>
+                        <td>{% if account.email %}{{ account.email }}{% else %}No email{% endif %}</td>
+                        <td>
+                            <span class="table-badge {% if account.current_role == 'driver' %}success{% elif account.current_role == 'admin' %}info{% else %}neutral{% endif %}">
+                                {{ account.current_role|title }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if account.can_edit %}
+                            <form class="role-inline-form" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="user_id" value="{{ account.id }}">
+                                <label class="sr-only" for="role-{{ account.id }}">Role for {{ account.username }}</label>
+                                <select id="role-{{ account.id }}" name="role" class="auth-input role-select">
+                                    {% for value, label in editable_roles %}
+                                    <option value="{{ value }}"{% if value == account.current_role %} selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button class="primary-btn role-update-btn" type="submit">Save</button>
+                            </form>
+                            {% else %}
+                            <span class="role-lock-note">{{ account.lock_reason }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="role-empty-state">
+                                <strong>No matching users found.</strong>
+                                <p>Try a different username, email, or full name.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="role-card-list">
+            {% for account in managed_users %}
+            <article class="role-user-card">
+                <div class="role-user-card__head">
+                    <div>
+                        <strong>{{ account.username }}</strong>
+                        <p>{% if account.full_name %}{{ account.full_name }}{% else %}No full name added{% endif %}</p>
+                    </div>
+                    <span class="table-badge {% if account.current_role == 'driver' %}success{% elif account.current_role == 'admin' %}info{% else %}neutral{% endif %}">
+                        {{ account.current_role|title }}
+                    </span>
+                </div>
+                <p class="role-user-card__meta">{% if account.email %}{{ account.email }}{% else %}No email{% endif %}</p>
+                {% if account.can_edit %}
+                <form class="role-inline-form role-inline-form--stacked" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ account.id }}">
+                    <label class="sr-only" for="mobile-role-{{ account.id }}">Role for {{ account.username }}</label>
+                    <select id="mobile-role-{{ account.id }}" name="role" class="auth-input role-select">
+                        {% for value, label in editable_roles %}
+                        <option value="{{ value }}"{% if value == account.current_role %} selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="primary-btn role-update-btn" type="submit">Update Role</button>
+                </form>
+                {% else %}
+                <p class="role-lock-note">{{ account.lock_reason }}</p>
+                {% endif %}
+            </article>
+            {% empty %}
+            <article class="role-user-card">
+                <strong>No matching users found.</strong>
+                <p class="role-user-card__meta">Try a different username, email, or full name.</p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+</section>
+{% endblock %}
