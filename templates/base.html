@@ -111,6 +111,10 @@
                     <span class="nav-icon">N</span>
                     Analytics
                 </a>
+                <a class="{% if page_name == 'manage-roles' %}active{% endif %}" href="{% url 'manage-roles' %}">
+                    <span class="nav-icon">U</span>
+                    Manage Roles
+                </a>
                 {% endif %}
             </nav>
 

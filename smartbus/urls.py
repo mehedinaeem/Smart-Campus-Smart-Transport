@@ -25,7 +25,7 @@ from apps.core.views import (
     my_booking_view,
     student_dashboard_view,
 )
-from apps.dashboard.views import admin_dashboard_view, analytics_view
+from apps.dashboard.views import admin_dashboard_view, analytics_view, manage_roles_view
 from apps.fuel.views import alerts_monitoring_view
 from apps.routing.views import bus_schedule_view
 from apps.tracking.views import live_tracking_view
@@ -42,6 +42,7 @@ urlpatterns = [
     path('driver/', driver_dashboard_view, name='driver-dashboard'),
     path('schedule/', bus_schedule_view, name='bus-schedule'),
     path('admin/', admin_dashboard_view, name='admin-dashboard'),
+    path('admin/roles/', manage_roles_view, name='manage-roles'),
     path('alerts/', alerts_monitoring_view, name='alerts-monitoring'),
     path('analytics/', analytics_view, name='analytics'),
 ]
