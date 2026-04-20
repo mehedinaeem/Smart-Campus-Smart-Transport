@@ -1178,11 +1178,133 @@ th {
     gap: 24px;
 }
 
+.schedule-hero,
+.schedule-sections,
+.schedule-vehicle-grid,
+.schedule-route-grid,
+.schedule-notes-grid {
+    display: grid;
+    gap: 24px;
+}
+
 .schedule-grid,
 .insight-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
+}
+
+.schedule-hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    padding: 28px;
+}
+
+.schedule-hero p {
+    max-width: 72ch;
+}
+
+.schedule-sections {
+    grid-template-columns: 1fr;
+}
+
+.schedule-section-panel {
+    padding: 28px;
+}
+
+.schedule-vehicle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 22px;
+}
+
+.schedule-vehicle-card,
+.schedule-support-panel {
+    padding: 22px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.schedule-vehicle-head {
+    margin-bottom: 18px;
+}
+
+.schedule-vehicle-head h4,
+.schedule-support-panel h3 {
+    margin: 6px 0 0;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 1.35rem;
+}
+
+.schedule-route-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.schedule-route-block {
+    padding: 18px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(97, 168, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.schedule-route-block strong {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 1rem;
+}
+
+.schedule-time-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.schedule-time-list li {
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(7, 17, 31, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(239, 245, 255, 0.94);
+}
+
+.schedule-notes-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.schedule-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    align-items: end;
+    gap: 24px;
+    padding: 22px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.schedule-footer h3 {
+    margin: 6px 0 10px;
+    font-family: "Space Grotesk", sans-serif;
+}
+
+.schedule-footer__meta {
+    display: grid;
+    gap: 14px;
+}
+
+.schedule-footer__meta div {
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(97, 168, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.schedule-footer__meta strong {
+    display: block;
+    margin-bottom: 6px;
 }
 
 .alerts-grid {
@@ -1261,6 +1383,11 @@ th {
     .dashboard-strip,
     .alerts-grid,
     .schedule-grid,
+    .schedule-hero,
+    .schedule-vehicle-grid,
+    .schedule-route-grid,
+    .schedule-notes-grid,
+    .schedule-footer,
     .insight-grid {
         grid-template-columns: 1fr;
     }
@@ -1485,6 +1612,22 @@ th {
     .analytics-grid,
     .trips-panel {
         min-width: 0;
+    }
+
+    .schedule-section-panel,
+    .schedule-hero,
+    .schedule-vehicle-card,
+    .schedule-support-panel,
+    .schedule-footer {
+        padding: 20px;
+    }
+
+    .schedule-vehicle-grid {
+        margin-top: 18px;
+    }
+
+    .schedule-route-block {
+        padding: 16px;
     }
 
     .seat-layout {

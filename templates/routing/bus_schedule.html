@@ -2,10 +2,13 @@
 
 {% block content %}
 <section class="schedule-layout">
-    <div class="glass-panel alerts-hero">
-        <p class="eyebrow">Schedule Overview</p>
-        <h3>{{ hero_schedule.line }}</h3>
-        <p>{{ hero_schedule.window }} with a steady cadence of {{ hero_schedule.cadence }}.</p>
+    <div class="glass-panel schedule-hero">
+        <div>
+            <p class="eyebrow">বাস সময়সূচি</p>
+            <h3>{{ hero_schedule.title }}</h3>
+            <p>{{ hero_schedule.summary }}</p>
+        </div>
+        <span class="status-chip">{{ hero_schedule.badge }}</span>
     </div>
 
     <section class="schedule-grid">
@@ -16,59 +19,84 @@
             <span>{{ card.detail }}</span>
         </article>
         {% endfor %}
+    </section>
 
-        <div class="glass-panel trips-panel">
+    <section class="schedule-sections">
+        {% for section in schedule_sections %}
+        <article class="glass-panel schedule-section-panel">
             <div class="section-header">
                 <div>
-                    <p class="eyebrow">Upcoming Departures</p>
-                    <h3>Student-friendly route timing</h3>
+                    <p class="eyebrow">{{ section.title }}</p>
+                    <h3>{{ section.subtitle }}</h3>
                 </div>
-                <span class="status-chip">Live Schedule</span>
+                <span class="status-chip">সার্ভিস গ্রুপ {{ forloop.counter }}</span>
             </div>
-            <div class="table-shell">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Route</th>
-                            <th>Stop</th>
-                            <th>Time</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for departure in departures %}
-                        <tr>
-                            <td>{{ departure.route }}</td>
-                            <td>{{ departure.stop }}</td>
-                            <td>{{ departure.time }}</td>
-                            <td>
-                                <span class="table-badge {% if departure.status == 'Delayed' %}warning{% elif departure.status == 'Boarding' %}neutral{% else %}success{% endif %}">
-                                    {{ departure.status }}
-                                </span>
-                            </td>
-                        </tr>
+            <div class="schedule-vehicle-grid">
+                {% for group in section.groups %}
+                <section class="schedule-vehicle-card">
+                    <div class="schedule-vehicle-head">
+                        <p class="eyebrow">যানবাহনের ধরন</p>
+                        <h4>{{ group.vehicle }}</h4>
+                    </div>
+                    <div class="schedule-route-grid">
+                        {% for route in group.routes %}
+                        <div class="schedule-route-block">
+                            <strong>{{ route.label }}</strong>
+                            <ul class="schedule-time-list">
+                                {% for time in route.times %}
+                                <li>{{ time }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </div>
+                </section>
+                {% endfor %}
             </div>
-        </div>
+        </article>
+        {% endfor %}
+    </section>
 
+    <!-- <section class="schedule-notes-grid">
         <div class="glass-panel compact-list">
             <div class="section-header">
                 <div>
-                    <p class="eyebrow">Travel Notes</p>
-                    <h3>What riders should know</h3>
+                    <p class="eyebrow">ব্যবহার নির্দেশনা</p>
+                    <h3>দ্রুত দেখার জন্য গুরুত্বপূর্ণ নোট</h3>
                 </div>
             </div>
-            {% for note in route_notes %}
+            {% for note in schedule_notes %}
             <div class="list-row">
                 <div>
-                    <strong>Campus Transit</strong>
+                    <strong>ক্যাম্পাস ট্রানজিট</strong>
                     <p>{{ note }}</p>
                 </div>
             </div>
             {% endfor %}
         </div>
-    </section>
+
+        <div class="glass-panel schedule-support-panel">
+            <p class="eyebrow">রুট গাইড</p>
+            <h3>প্রস্থান ও রিটার্ন আলাদা করে দেখুন</h3>
+            <p>প্রতিটি সার্ভিস কার্ডে উৎসভিত্তিক ট্রিপ এবং বিশ্ববিদ্যালয় ক্যাম্পাস থেকে ফেরত ট্রিপ আলাদা ব্লকে সাজানো আছে, তাই শিক্ষার্থী, শিক্ষক ও কর্মচারীরা দ্রুত নিজেদের সময় খুঁজে পাবেন।</p>
+        </div>
+    </section> -->
+    <footer class="glass-panel schedule-footer">
+        <div>
+            <p class="eyebrow">Schedule Support</p>
+            <h3>Need an updated transport notice?</h3>
+            <p>For route changes, holiday transport plans, or urgent timing adjustments, please follow the transport office notice and campus administration updates.</p>
+        </div>
+        <div class="schedule-footer__meta">
+            <div>
+                <strong>Transport Office</strong>
+                <p>Campus operations desk</p>
+            </div>
+            <div>
+                <strong>Schedule Coverage</strong>
+                <p>Teacher, staff, student, and Dhaka service</p>
+            </div>
+        </div>
+    </footer>
 </section>
 {% endblock %}
