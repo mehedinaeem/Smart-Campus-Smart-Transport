@@ -115,7 +115,10 @@
             </nav>
 
             {% if is_admin_user %}
-            <a class="mobile-drawer-cta primary-btn" href="{% url 'admin-dashboard' %}">Open Admin Desk</a>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button class="mobile-drawer-cta primary-btn" type="submit">Logout</button>
+            </form>
             {% elif is_driver %}
             <a class="mobile-drawer-cta primary-btn" href="{% url 'driver-dashboard' %}">Open Route Desk</a>
             {% elif request.user.is_authenticated %}
