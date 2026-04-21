@@ -1475,6 +1475,165 @@ th {
     cursor: pointer;
 }
 
+.secondary-btn,
+.table-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    text-decoration: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+.secondary-btn:hover,
+.table-action-btn:hover,
+.table-action-link:hover {
+    background: rgba(255, 255, 255, 0.09);
+}
+
+.trip-admin-layout {
+    display: grid;
+    gap: 24px;
+}
+
+.trip-admin-layout .role-admin-hero {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 28px;
+}
+
+.trip-admin-layout .role-admin-hero > * {
+    min-width: 0;
+}
+
+.trip-admin-form,
+.trip-form-grid,
+.assignment-form-list {
+    display: grid;
+    gap: 16px;
+}
+
+.trip-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 18px;
+}
+
+.form-field,
+.assignment-delete {
+    display: grid;
+    gap: 8px;
+}
+
+.form-field span,
+.assignment-delete span {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(12, 22, 41, 0.95);
+    color: var(--text);
+    font: inherit;
+}
+
+.form-field textarea {
+    min-height: 108px;
+    resize: vertical;
+}
+
+.assignment-form-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 100px;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.assignment-delete {
+    align-content: center;
+}
+
+.assignment-delete input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+.trip-admin-form .section-header {
+    margin-top: 8px;
+}
+
+.trip-admin-form .errorlist,
+.trip-admin-form .errorlist li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.trip-admin-form .errorlist {
+    color: #ffb4c0;
+    font-size: 0.88rem;
+}
+
+.trip-form-actions,
+.trip-action-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.table-action-link {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.table-action-btn.warning {
+    color: #fff6cf;
+    border-color: rgba(251, 191, 36, 0.22);
+    background: rgba(251, 191, 36, 0.12);
+}
+
+.booking-trip-list {
+    display: grid;
+    gap: 12px;
+}
+
+.booking-trip-row,
+.tracking-trip-row {
+    text-decoration: none;
+    color: inherit;
+    border-radius: 18px;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.booking-trip-row.active,
+.tracking-trip-row.active {
+    background: rgba(97, 168, 255, 0.08);
+    border-color: rgba(97, 168, 255, 0.28);
+}
+
+.booking-trip-row:hover,
+.tracking-trip-row:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.04);
+}
+
 @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.45); }
     70% { box-shadow: 0 0 0 12px rgba(52, 211, 153, 0); }
@@ -1761,5 +1920,10 @@ th {
 
     .seat-layout {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .trip-form-grid,
+    .assignment-form-row {
+        grid-template-columns: 1fr;
     }
 }

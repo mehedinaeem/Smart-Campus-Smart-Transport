@@ -4,6 +4,8 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import redirect, render
 from django.views.generic import FormView
 
+from apps.routing.services import get_current_driver_assignment
+
 from .auth_utils import get_post_login_url, get_safe_redirect
 from .decorators import role_required
 from .forms import LoginForm, StudentSignupForm
@@ -94,20 +96,26 @@ def my_booking_view(request):
     denied_message="Only drivers can access assigned route data.",
 )
 def driver_dashboard_view(request):
+    assignment = get_current_driver_assignment(request.user)
     context = {
         "page_title": "My Assigned Route",
         "page_name": "driver-dashboard",
         "assignment": {
-            "route": "Campus Link South",
-            "bus_id": "BUS-17",
-            "shift": "07:30 AM - 02:00 PM",
+            "route": assignment.trip.route_label if assignment else "No trip assigned yet",
+            "bus_id": assignment.bus.code if assignment else "--",
+            "shift": (
+                f"{assignment.trip.start_time.strftime('%I:%M %p')} - {assignment.trip.end_time.strftime('%I:%M %p')}"
+                if assignment
+                else "Awaiting assignment"
+            ),
             "supervisor": "Transit Control",
-            "next_stop": "Business School",
+            "next_stop": assignment.trip.section_subtitle if assignment else "No active checkpoint",
         },
         "checkpoints": [
             {"label": "Fuel Level", "value": "68%", "detail": "Healthy range"},
-            {"label": "Trip Status", "value": "On Schedule", "detail": "No active delay"},
-            {"label": "Assigned Zone", "value": "South Corridor", "detail": "5 active stops"},
+            {"label": "Trip Status", "value": assignment.trip.status_label if assignment else "Idle", "detail": "Live from trip assignment"},
+            {"label": "Assigned Zone", "value": assignment.trip.section_subtitle if assignment else "No zone", "detail": "Derived from schedule section"},
         ],
+        "has_assignment": bool(assignment),
     }
     return render(request, "core/driver_dashboard.html", context)

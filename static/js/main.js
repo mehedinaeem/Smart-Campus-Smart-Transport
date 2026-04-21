@@ -137,6 +137,24 @@
         }
     });
 
+    const addAssignmentRowButton = document.querySelector("[data-add-assignment-row]");
+    const assignmentList = document.querySelector("[data-assignment-list]");
+    const assignmentEmptyTemplate = document.getElementById("assignment-empty-form");
+    const totalFormsInput = document.getElementById("id_assignments-TOTAL_FORMS");
+
+    addAssignmentRowButton?.addEventListener("click", () => {
+        if (!assignmentList || !assignmentEmptyTemplate || !totalFormsInput) {
+            return;
+        }
+
+        const index = Number.parseInt(totalFormsInput.value, 10);
+        assignmentList.insertAdjacentHTML(
+            "beforeend",
+            assignmentEmptyTemplate.innerHTML.replace(/__prefix__/g, index),
+        );
+        totalFormsInput.value = String(index + 1);
+    });
+
     function renderLineChart(canvasId, points, colorA, colorB) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) {

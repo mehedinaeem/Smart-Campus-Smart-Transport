@@ -103,6 +103,10 @@
                     <span class="nav-icon">D</span>
                     Admin Dashboard
                 </a>
+                <a class="{% if page_name == 'trip-assignments' %}active{% endif %}" href="{% url 'trip-assignments' %}">
+                    <span class="nav-icon">T</span>
+                    Trip Assignments
+                </a>
                 <a class="{% if page_name == 'alerts' %}active{% endif %}" href="{% url 'alerts-monitoring' %}">
                     <span class="nav-icon">A</span>
                     Alerts &amp; Monitoring
@@ -179,6 +183,7 @@
                                 <a class="profile-link" href="{% url 'driver-dashboard' %}">My Assigned Route</a>
                                 {% elif is_admin_user %}
                                 <a class="profile-link" href="{% url 'admin-dashboard' %}">Admin Workspace</a>
+                                <a class="profile-link" href="{% url 'trip-assignments' %}">Trip Assignments</a>
                                 {% endif %}
                                 <form method="post" action="{% url 'logout' %}">
                                     {% csrf_token %}

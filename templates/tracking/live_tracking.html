@@ -2,6 +2,32 @@
 
 {% block content %}
 <section class="tracking-layout">
+    <aside class="glass-panel trip-sidebar">
+        <div class="section-header">
+            <div>
+                <p class="eyebrow">Assigned Trips</p>
+                <h3>Upcoming and active buses</h3>
+            </div>
+        </div>
+        {% for assignment in assignments %}
+        <a class="timeline-stop tracking-trip-row {% if selected_assignment and assignment.pk == selected_assignment.pk %}active{% endif %}" href="{% url 'live-tracking' %}?assignment={{ assignment.pk }}">
+            <div class="timeline-dot"></div>
+            <div>
+                <strong>{{ assignment.trip.route_label }}</strong>
+                <p>{{ assignment.bus.code }} • {{ assignment.trip.start_time|time:"g:i A" }} • {{ assignment.trip.status_label }}</p>
+            </div>
+        </a>
+        {% empty %}
+        <div class="timeline-stop">
+            <div class="timeline-dot"></div>
+            <div>
+                <strong>No active or upcoming trips.</strong>
+                <p>Trips appear here only while they are upcoming or active.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </aside>
+
     <div class="glass-panel tracking-map-panel">
         <div class="section-header">
             <div>

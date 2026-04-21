@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="trip-admin-layout">
+    <div class="glass-panel role-admin-hero">
+        <div class="section-header">
+            <div>
+                <p class="eyebrow">Trip Assignment Workspace</p>
+                <h3>{% if selected_trip %}Edit assigned trip{% else %}Create a schedule-linked trip{% endif %}</h3>
+                <p>Trips are created from existing schedule slots, then buses and optional drivers are attached per assignment row.</p>
+            </div>
+            <span class="status-chip">{% if selected_trip %}Editing trip #{{ selected_trip.id }}{% else %}New assignment{% endif %}</span>
+        </div>
+
+        <form method="post" class="trip-admin-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_trip">
+            <input type="hidden" name="trip_id" value="{% if selected_trip %}{{ selected_trip.id }}{% endif %}">
+
+            {{ trip_form.non_field_errors }}
+            <div class="trip-form-grid">
+                {% for field in trip_form %}
+                <label class="form-field">
+                    <span>{{ field.label }}</span>
+                    {{ field }}
+                    {{ field.errors }}
+                </label>
+                {% endfor %}
+            </div>
+
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">Bus Assignments</p>
+                    <h3>One row per assigned bus</h3>
+                </div>
+                <button class="secondary-btn" type="button" data-add-assignment-row>Add bus row</button>
+            </div>
+
+            {{ assignment_formset.management_form }}
+            {{ assignment_formset.non_form_errors }}
+            <div class="assignment-form-list" data-assignment-list>
+                {% for form in assignment_formset %}
+                <div class="assignment-form-row" data-assignment-form>
+                    {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+                    <label class="form-field">
+                        <span>Bus</span>
+                        {{ form.bus }}
+                        {{ form.bus.errors }}
+                    </label>
+                    <label class="form-field">
+                        <span>Driver</span>
+                        {{ form.driver }}
+                        {{ form.driver.errors }}
+                    </label>
+                    <label class="assignment-delete">
+                        <span>Remove</span>
+                        {{ form.DELETE }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+
+            <template id="assignment-empty-form">
+                <div class="assignment-form-row" data-assignment-form>
+                    {% for hidden in assignment_formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+                    <label class="form-field">
+                        <span>Bus</span>
+                        {{ assignment_formset.empty_form.bus }}
+                    </label>
+                    <label class="form-field">
+                        <span>Driver</span>
+                        {{ assignment_formset.empty_form.driver }}
+                    </label>
+                    <label class="assignment-delete">
+                        <span>Remove</span>
+                        {{ assignment_formset.empty_form.DELETE }}
+                    </label>
+                </div>
+            </template>
+
+            <div class="trip-form-actions">
+                <button class="primary-btn" type="submit">Save Trip</button>
+                {% if selected_trip %}
+                <a class="secondary-btn" href="{% url 'trip-assignments' %}">Create New</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <section class="glass-panel trips-panel">
+        <div class="section-header">
+            <div>
+                <p class="eyebrow">Upcoming and Active</p>
+                <h3>Trips currently feeding booking and tracking</h3>
+            </div>
+        </div>
+        <div class="table-shell">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Route</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Buses</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trip in active_trips %}
+                    <tr>
+                        <td>{{ trip.route_label }}</td>
+                        <td>{{ trip.service_date }} • {{ trip.start_time|time:"g:i A" }}</td>
+                        <td><span class="table-badge {% if trip.runtime_status == 'active' %}success{% elif trip.runtime_status == 'booking_open' %}info{% else %}neutral{% endif %}">{{ trip.status_label }}</span></td>
+                        <td>{% for assignment in trip.assignments.all %}{{ assignment.bus.code }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                        <td class="trip-action-cell">
+                            <a class="table-action-link" href="{% url 'trip-assignments' %}?edit={{ trip.id }}">Edit</a>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="trip_id" value="{{ trip.id }}">
+                                <input type="hidden" name="action" value="cancel">
+                                <button class="table-action-btn warning" type="submit">Cancel</button>
+                            </form>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="trip_id" value="{{ trip.id }}">
+                                <input type="hidden" name="action" value="complete">
+                                <button class="table-action-btn" type="submit">Complete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">No trip assignments have been created yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="glass-panel trips-panel">
+        <div class="section-header">
+            <div>
+                <p class="eyebrow">History</p>
+                <h3>Completed and cancelled trips remain archived</h3>
+            </div>
+        </div>
+        <div class="table-shell">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Route</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Buses</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trip in history_trips %}
+                    <tr>
+                        <td>{{ trip.route_label }}</td>
+                        <td>{{ trip.service_date }} • {{ trip.start_time|time:"g:i A" }}</td>
+                        <td><span class="table-badge {% if trip.runtime_status == 'cancelled' %}warning{% else %}neutral{% endif %}">{{ trip.status_label }}</span></td>
+                        <td>{% for assignment in trip.assignments.all %}{{ assignment.bus.code }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No completed or cancelled trips yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
+{% endblock %}
