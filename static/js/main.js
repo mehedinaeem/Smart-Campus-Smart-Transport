@@ -93,6 +93,8 @@
     const bookingModal = document.getElementById("booking-modal");
     const selectedSeatLabel = document.getElementById("selected-seat-label");
     const closeModalButton = document.querySelector("[data-close-modal]");
+    const bookingForm = document.querySelector("[data-booking-form]");
+    const selectedSeatInput = document.querySelector("[data-selected-seat-input]");
     let selectedSeat = null;
 
     seats.forEach((seat) => {
@@ -113,6 +115,12 @@
                 if (activeSeatLabel) {
                     activeSeatLabel.textContent = "Select any available seat first";
                 }
+                return;
+            }
+
+            if (selectedSeatInput && bookingForm) {
+                selectedSeatInput.value = selectedSeat;
+                bookingForm.submit();
                 return;
             }
 
