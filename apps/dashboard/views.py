@@ -13,6 +13,15 @@ from apps.routing.services import get_live_assignments, get_trip_history
 from .forms import RoleAssignmentForm
 
 
+def _coerce_trip_id(raw_value):
+    if raw_value in {None, "", "None", "null"}:
+        return None
+    try:
+        return int(raw_value)
+    except (TypeError, ValueError):
+        return None
+
+
 @role_required(
     "admin",
     login_message="Please login to access the admin dashboard.",
@@ -43,12 +52,13 @@ def admin_dashboard_view(request):
 )
 def trip_assignments_view(request):
     selected_trip = None
-    edit_id = request.GET.get("edit") or request.POST.get("trip_id")
+    edit_id = _coerce_trip_id(request.GET.get("edit") or request.POST.get("trip_id"))
     if edit_id:
         selected_trip = get_object_or_404(Trip.objects.prefetch_related("assignments"), pk=edit_id)
 
     if request.method == "POST" and request.POST.get("action") in {"cancel", "complete"}:
-        trip = get_object_or_404(Trip, pk=request.POST.get("trip_id"))
+        trip_id = _coerce_trip_id(request.POST.get("trip_id"))
+        trip = get_object_or_404(Trip, pk=trip_id)
         trip.status = Trip.STATUS_CANCELLED if request.POST["action"] == "cancel" else Trip.STATUS_COMPLETED
         trip.save(update_fields=["status", "updated_at"])
         messages.success(request, f"Trip for {trip.route_label} was updated to {trip.get_status_display().lower()}.")
@@ -67,8 +77,17 @@ def trip_assignments_view(request):
                 assignment_formset.instance = trip
                 assignment_instances = []
                 assignment_validation_failed = False
+                assignments_to_delete = []
                 for form in assignment_formset.forms:
-                    if not form.cleaned_data or form.cleaned_data.get("DELETE", False) or not form.cleaned_data.get("bus"):
+                    if not form.cleaned_data:
+                        continue
+
+                    if form.cleaned_data.get("DELETE", False):
+                        if form.instance.pk:
+                            assignments_to_delete.append(form.instance)
+                        continue
+
+                    if not form.cleaned_data.get("bus"):
                         continue
                     assignment = form.save(commit=False)
                     assignment.trip = trip
@@ -87,7 +106,7 @@ def trip_assignments_view(request):
                     trip_form.add_error(None, "Please resolve the highlighted assignment conflicts.")
                     raise ValidationError({})
 
-                for deleted_instance in assignment_formset.deleted_objects:
+                for deleted_instance in assignments_to_delete:
                     deleted_instance.delete()
 
                 for assignment in assignment_instances:
