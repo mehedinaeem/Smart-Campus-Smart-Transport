@@ -5,7 +5,7 @@
     <div class="glass-panel alerts-hero">
         <p class="eyebrow">Operations Intelligence</p>
         <h3>Analytics for route planning and fleet health</h3>
-        <p>Admin users get a clearer system view with fast-read KPIs, risk notes, and trend context in the same visual language as the rest of the product.</p>
+        <p>Every KPI on this page now comes from current trips, bookings, telemetry, fuel readings, and live alert logic already present in the system.</p>
     </div>
 
     <section class="insight-grid">
@@ -25,11 +25,12 @@
                 </div>
             </div>
             {% for row in insight_rows %}
-            <div class="list-row">
+            <div class="list-row analytics-signal-row">
                 <div>
                     <strong>{{ row.title }}</strong>
                     <p>{{ row.detail }}</p>
                 </div>
+                <span class="table-badge neutral">{{ row.value }}</span>
             </div>
             {% endfor %}
         </div>
@@ -37,21 +38,43 @@
         <div class="glass-panel chart-panel">
             <div class="section-header">
                 <div>
-                    <p class="eyebrow">Ridership Pattern</p>
-                    <h3>Demand curve snapshot</h3>
+                    <p class="eyebrow">{{ ridership_chart.eyebrow }}</p>
+                    <h3>{{ ridership_chart.title }}</h3>
                 </div>
             </div>
-            <canvas id="usageChart" height="180"></canvas>
+            <p class="chart-detail">{{ ridership_chart.detail }}</p>
+            <canvas
+                id="usageChart"
+                height="180"
+                data-chart-points="{{ ridership_chart.points|join:',' }}"
+                data-chart-labels="{{ ridership_chart.labels|join:',' }}"
+            ></canvas>
+            <div class="chart-label-row">
+                {% for label in ridership_chart.labels %}
+                <span>{{ label }}</span>
+                {% endfor %}
+            </div>
         </div>
 
         <div class="glass-panel chart-panel">
             <div class="section-header">
                 <div>
-                    <p class="eyebrow">Resource Balance</p>
-                    <h3>Fuel and energy mix</h3>
+                    <p class="eyebrow">{{ resource_chart.eyebrow }}</p>
+                    <h3>{{ resource_chart.title }}</h3>
                 </div>
             </div>
-            <canvas id="fuelChart" height="180"></canvas>
+            <p class="chart-detail">{{ resource_chart.detail }}</p>
+            <canvas
+                id="fuelChart"
+                height="180"
+                data-chart-points="{{ resource_chart.points|join:',' }}"
+                data-chart-labels="{{ resource_chart.labels|join:',' }}"
+            ></canvas>
+            <div class="chart-label-row">
+                {% for label in resource_chart.labels %}
+                <span>{{ label }}</span>
+                {% endfor %}
+            </div>
         </div>
     </section>
 </section>

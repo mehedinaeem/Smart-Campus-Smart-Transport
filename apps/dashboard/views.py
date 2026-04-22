@@ -11,6 +11,7 @@ from apps.routing.models import Trip
 from apps.routing.services import get_live_assignments, get_trip_history
 
 from .forms import RoleAssignmentForm
+from .services import get_analytics_page_context
 
 
 def _coerce_trip_id(raw_value):
@@ -146,16 +147,7 @@ def analytics_view(request):
     context = {
         "page_title": "Analytics",
         "page_name": "analytics",
-        "insight_cards": [
-            {"label": "Avg Occupancy", "value": "74%", "detail": "Morning peak remains the busiest period"},
-            {"label": "On-Time Rate", "value": "93.4%", "detail": "Up 4.1% over last week"},
-            {"label": "Alert Resolution", "value": "18 min", "detail": "Mean response time across active routes"},
-        ],
-        "insight_rows": [
-            {"title": "Route Demand", "detail": "North Loop and Dorm Express are driving most seat bookings this week."},
-            {"title": "Fuel Efficiency", "detail": "Electric fleet zones show the strongest efficiency during afternoon rotations."},
-            {"title": "Operational Risk", "detail": "Two congestion clusters are affecting the Medical Shuttle corridor."},
-        ],
+        **get_analytics_page_context(),
     }
     return render(request, "dashboard/analytics.html", context)
 

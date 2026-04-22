@@ -163,11 +163,26 @@
         totalFormsInput.value = String(index + 1);
     });
 
-    function renderLineChart(canvasId, points, colorA, colorB) {
+    function parseChartPoints(canvas, fallbackPoints) {
+        const rawPoints = canvas?.dataset.chartPoints;
+        if (!rawPoints) {
+            return fallbackPoints;
+        }
+
+        const parsed = rawPoints
+            .split(",")
+            .map((value) => Number.parseFloat(value.trim()))
+            .filter((value) => Number.isFinite(value));
+
+        return parsed.length ? parsed : fallbackPoints;
+    }
+
+    function renderLineChart(canvasId, fallbackPoints, colorA, colorB) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) {
             return;
         }
+        const points = parseChartPoints(canvas, fallbackPoints);
 
         const ctx = canvas.getContext("2d");
         const width = canvas.width = canvas.offsetWidth * 2;
@@ -177,7 +192,7 @@
         const displayWidth = width / 2;
         const displayHeight = height / 2;
         const padding = 26;
-        const maxPoint = Math.max(...points);
+        const maxPoint = Math.max(...points, 1);
         const step = (displayWidth - padding * 2) / (points.length - 1);
 
         ctx.clearRect(0, 0, displayWidth, displayHeight);
@@ -220,11 +235,12 @@
         });
     }
 
-    function renderBarChart(canvasId, points, colorA, colorB) {
+    function renderBarChart(canvasId, fallbackPoints, colorA, colorB) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) {
             return;
         }
+        const points = parseChartPoints(canvas, fallbackPoints);
 
         const ctx = canvas.getContext("2d");
         const width = canvas.width = canvas.offsetWidth * 2;
@@ -233,7 +249,7 @@
 
         const displayWidth = width / 2;
         const displayHeight = height / 2;
-        const maxPoint = Math.max(...points);
+        const maxPoint = Math.max(...points, 1);
         const barWidth = 42;
         const gap = 22;
         const startX = 32;

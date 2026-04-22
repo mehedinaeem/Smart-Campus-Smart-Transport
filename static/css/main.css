@@ -1224,6 +1224,31 @@ th {
     gap: 24px;
 }
 
+.analytics-signal-row {
+    gap: 16px;
+}
+
+.chart-detail {
+    margin: 0;
+    color: var(--muted);
+}
+
+.chart-label-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+
+.chart-label-row span {
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 .schedule-hero {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: end;
@@ -1935,6 +1960,14 @@ th {
     .trips-panel,
     .alert-head__badges {
         min-width: 0;
+    }
+
+    .analytics-signal-row {
+        align-items: flex-start;
+    }
+
+    .analytics-signal-row .table-badge {
+        justify-self: flex-start;
     }
 
     .alerts-filter-actions {
