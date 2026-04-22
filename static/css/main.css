@@ -1107,7 +1107,8 @@ body.mobile-menu-open {
 }
 
 .tracking-layout {
-    grid-template-columns: minmax(0, 1.5fr) minmax(290px, 0.7fr);
+    grid-template-columns: minmax(0, 1.9fr) minmax(300px, 0.7fr);
+    align-items: start;
 }
 
 .trip-sidebar {
