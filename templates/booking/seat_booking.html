@@ -10,6 +10,15 @@
             </div>
             <span class="status-chip">{{ assignments|length }} visible now</span>
         </div>
+        {% if active_booking %}
+        <div class="list-row booking-state-banner">
+            <div>
+                <strong>Your active booking is on {{ active_booking.assignment.bus.code }}.</strong>
+                <p>You can book again after this trip is completed or cancelled.</p>
+            </div>
+            <a class="table-action-link" href="{% url 'my-booking' %}">View booking</a>
+        </div>
+        {% endif %}
         {% for assignment in assignments %}
         <a class="list-row booking-trip-row {% if selected_assignment and assignment.pk == selected_assignment.pk %}active{% endif %}" href="{% url 'seat-booking' %}?assignment={{ assignment.pk }}">
             <div>
@@ -70,9 +79,14 @@
     <div class="stack-column">
         <div class="glass-panel selection-card">
             <p class="eyebrow">Selection</p>
-            <h3 id="active-seat">Choose a seat</h3>
-            <p>{% if selected_assignment %}Tap a seat to preview your booking. Premium seats are closest to the front entry for faster boarding.{% else %}Select an active trip once a booking window opens.{% endif %}</p>
-            <button class="primary-btn wide-btn" type="button" id="confirm-booking-btn" {% if not selected_assignment %}disabled{% endif %}>Confirm Booking</button>
+            <h3 id="active-seat">{% if active_booking %}Active booking already exists{% else %}Choose a seat{% endif %}</h3>
+            <p>{% if active_booking %}You can keep tracking your current seat in My Booking until that trip completes.{% elif selected_assignment %}Tap a seat to preview your booking. Premium seats are closest to the front entry for faster boarding.{% else %}Select an active trip once a booking window opens.{% endif %}</p>
+            <form method="post" data-booking-form>
+                {% csrf_token %}
+                <input type="hidden" name="assignment_id" value="{% if selected_assignment %}{{ selected_assignment.pk }}{% endif %}">
+                <input type="hidden" name="seat_number" value="" data-selected-seat-input>
+                <button class="primary-btn wide-btn" type="button" id="confirm-booking-btn" {% if not selected_assignment or active_booking %}disabled{% endif %}>Confirm Booking</button>
+            </form>
         </div>
 
         <div class="glass-panel qr-preview">

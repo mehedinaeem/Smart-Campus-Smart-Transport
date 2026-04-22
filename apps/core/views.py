@@ -4,6 +4,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import redirect, render
 from django.views.generic import FormView
 
+from apps.booking.services import get_dashboard_booking_context
 from apps.routing.services import get_current_driver_assignment
 
 from .auth_utils import get_post_login_url, get_safe_redirect
@@ -48,6 +49,10 @@ class StudentSignupView(FormView):
 
 
 def student_dashboard_view(request):
+    booking_context = get_dashboard_booking_context(request.user) if request.user.is_authenticated else {
+        "active_booking": None,
+        "booking_history": [],
+    }
     context = {
         "page_title": "Home",
         "page_name": "dashboard",
@@ -65,6 +70,7 @@ def student_dashboard_view(request):
             {"name": "Dormitory West", "eta": "8 min"},
             {"name": "Medical Center", "eta": "12 min"},
         ],
+        **booking_context,
     }
     return render(request, "core/student_dashboard.html", context)
 
@@ -75,17 +81,11 @@ def student_dashboard_view(request):
     denied_message="Only students can access booking details.",
 )
 def my_booking_view(request):
+    booking_context = get_dashboard_booking_context(request.user)
     context = {
         "page_title": "My Booking",
         "page_name": "my-booking",
-        "booking": {
-            "route": "Green Line Express",
-            "seat": "B3",
-            "departure": "08:05 AM",
-            "status": "Confirmed",
-            "token": "7X9-Q2A",
-            "boarding_point": "Central Library",
-        },
+        **booking_context,
     }
     return render(request, "core/my_booking.html", context)
 
