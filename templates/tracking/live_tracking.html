@@ -19,25 +19,23 @@
             <div class="stop-pin pin-four"></div>
             <div class="moving-bus live-bus" id="live-bus-marker"><span>BUS</span></div>
         </div>
-    </div>
-
-    <aside class="glass-panel trip-sidebar">
-        <p class="eyebrow">Trip Details</p>
-        <div class="detail-block">
-            <span>Driver</span>
-            <strong>{{ trip.driver }}</strong>
-        </div>
-        <div class="detail-block">
-            <span>Vehicle</span>
-            <strong>{{ trip.bus_id }}</strong>
-        </div>
-        <div class="detail-block">
-            <span>Speed</span>
-            <strong>{{ trip.speed }}</strong>
-        </div>
-        <div class="detail-block">
-            <span>ETA</span>
-            <strong>{{ trip.eta }}</strong>
+        <div class="trip-meta">
+            <div>
+                <span>Driver</span>
+                <strong>{{ trip.driver }}</strong>
+            </div>
+            <div>
+                <span>Vehicle</span>
+                <strong>{{ trip.bus_id }}</strong>
+            </div>
+            <div>
+                <span>Speed</span>
+                <strong>{{ trip.speed }}</strong>
+            </div>
+            <div>
+                <span>ETA</span>
+                <strong>{{ trip.eta }}</strong>
+            </div>
         </div>
         <div class="section-header">
             <div>
@@ -51,6 +49,32 @@
             <div>
                 <strong>{{ stop }}</strong>
                 <p>Live checkpoint enabled</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <aside class="glass-panel trip-sidebar">
+        <div class="section-header">
+            <div>
+                <p class="eyebrow">Assigned Trips</p>
+                <h3>Upcoming and active buses</h3>
+            </div>
+        </div>
+        {% for assignment in assignments %}
+        <a class="timeline-stop tracking-trip-row {% if selected_assignment and assignment.pk == selected_assignment.pk %}active{% endif %}" href="{% url 'live-tracking' %}?assignment={{ assignment.pk }}">
+            <div class="timeline-dot"></div>
+            <div>
+                <strong>{{ assignment.trip.route_label }}</strong>
+                <p>{{ assignment.bus.code }} | {{ assignment.trip.start_time|time:"g:i A" }} | {{ assignment.trip.status_label }}</p>
+            </div>
+        </a>
+        {% empty %}
+        <div class="timeline-stop">
+            <div class="timeline-dot"></div>
+            <div>
+                <strong>No active or upcoming trips.</strong>
+                <p>Trips appear here only while they are upcoming or active.</p>
             </div>
         </div>
         {% endfor %}

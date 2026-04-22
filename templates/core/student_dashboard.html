@@ -67,6 +67,20 @@
 </section>
 
 <section class="dashboard-strip">
+    {% if request.user.is_authenticated and is_student %}
+    <div class="glass-panel feature-card">
+        <p class="eyebrow">Active Booking</p>
+        {% if active_booking %}
+        <h3>{{ active_booking.assignment.bus.code }} • {{ active_booking.seat_number }}</h3>
+        <p>{{ active_booking.route_label }} on {{ active_booking.assignment.trip.service_date }} at {{ active_booking.assignment.trip.start_time|time:"g:i A" }}.</p>
+        <a class="primary-btn wide-btn" href="{% url 'my-booking' %}">View Booking</a>
+        {% else %}
+        <h3>No active seat</h3>
+        <p>Book one seat for an open trip window and it will stay here until the trip completes.</p>
+        <a class="primary-btn wide-btn" href="{% url 'seat-booking' %}">Book Seat</a>
+        {% endif %}
+    </div>
+    {% endif %}
     <div class="glass-panel feature-card">
         <p class="eyebrow">Seat Confidence</p>
         <h3>One-tap booking</h3>

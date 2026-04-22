@@ -5,7 +5,7 @@
     <div class="glass-panel alerts-hero">
         <p class="eyebrow">Driver Workspace</p>
         <h3>{{ assignment.route }}</h3>
-        <p>{{ assignment.bus_id }} is assigned to your current shift. Keep route timing and telemetry checkpoints in view while driving.</p>
+        <p>{% if has_assignment %}{{ assignment.bus_id }} is assigned to your current shift. Keep route timing and telemetry checkpoints in view while driving.{% else %}Your next trip will appear here once an admin assigns you to a bus for a scheduled slot.{% endif %}</p>
     </div>
 
     <section class="schedule-grid">

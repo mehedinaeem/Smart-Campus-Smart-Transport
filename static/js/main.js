@@ -93,6 +93,8 @@
     const bookingModal = document.getElementById("booking-modal");
     const selectedSeatLabel = document.getElementById("selected-seat-label");
     const closeModalButton = document.querySelector("[data-close-modal]");
+    const bookingForm = document.querySelector("[data-booking-form]");
+    const selectedSeatInput = document.querySelector("[data-selected-seat-input]");
     let selectedSeat = null;
 
     seats.forEach((seat) => {
@@ -116,6 +118,12 @@
                 return;
             }
 
+            if (selectedSeatInput && bookingForm) {
+                selectedSeatInput.value = selectedSeat;
+                bookingForm.submit();
+                return;
+            }
+
             if (selectedSeatLabel) {
                 selectedSeatLabel.textContent = selectedSeat;
             }
@@ -135,6 +143,24 @@
         if (event.target === bookingModal) {
             closeModal();
         }
+    });
+
+    const addAssignmentRowButton = document.querySelector("[data-add-assignment-row]");
+    const assignmentList = document.querySelector("[data-assignment-list]");
+    const assignmentEmptyTemplate = document.getElementById("assignment-empty-form");
+    const totalFormsInput = document.getElementById("id_assignments-TOTAL_FORMS");
+
+    addAssignmentRowButton?.addEventListener("click", () => {
+        if (!assignmentList || !assignmentEmptyTemplate || !totalFormsInput) {
+            return;
+        }
+
+        const index = Number.parseInt(totalFormsInput.value, 10);
+        assignmentList.insertAdjacentHTML(
+            "beforeend",
+            assignmentEmptyTemplate.innerHTML.replace(/__prefix__/g, index),
+        );
+        totalFormsInput.value = String(index + 1);
     });
 
     function renderLineChart(canvasId, points, colorA, colorB) {

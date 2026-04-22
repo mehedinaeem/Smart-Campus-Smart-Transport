@@ -1,45 +1,86 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="booking-layout">
-    <div class="glass-panel booking-overview">
+<section class="trip-admin-layout">
+    <div class="booking-layout">
+        <div class="glass-panel booking-overview">
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">My Booking</p>
+                    <h3>{% if active_booking %}{{ active_booking.route_label }}{% else %}No active booking{% endif %}</h3>
+                </div>
+                <span class="status-chip {% if active_booking %}success{% else %}neutral{% endif %}">{% if active_booking %}Active{% else %}Waiting{% endif %}</span>
+            </div>
+
+            {% if active_booking %}
+            <div class="trip-meta">
+                <div><span>Seat</span><strong>{{ active_booking.seat_number }}</strong></div>
+                <div><span>Departure</span><strong>{{ active_booking.assignment.trip.start_time|time:"g:i A" }}</strong></div>
+                <div><span>Bus</span><strong>{{ active_booking.assignment.bus.code }}</strong></div>
+            </div>
+            <div class="trip-meta">
+                <div><span>Date</span><strong>{{ active_booking.assignment.trip.service_date }}</strong></div>
+                <div><span>Status</span><strong>{{ active_booking.assignment.trip.status_label }}</strong></div>
+                <div><span>Token</span><strong>{{ active_booking.token }}</strong></div>
+            </div>
+            {% else %}
+            <div class="list-row">
+                <div>
+                    <strong>You do not have an active trip booking.</strong>
+                    <p>Book a seat from the seat booking page when a trip window opens.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="stack-column">
+            <div class="glass-panel selection-card">
+                <p class="eyebrow">Boarding Token</p>
+                <h3>{% if active_booking %}{{ active_booking.token }}{% else %}No token yet{% endif %}</h3>
+                <p>{% if active_booking %}Your token stays active until the assigned trip is completed.{% else %}Your next confirmed seat will generate a boarding token here.{% endif %}</p>
+            </div>
+
+            <div class="glass-panel qr-preview">
+                <p class="eyebrow">Digital Pass</p>
+                <div class="token-card">
+                    <div class="qr-grid" aria-hidden="true">
+                        <span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span>
+                    </div>
+                    <div>
+                        <strong>{% if active_booking %}{{ active_booking.assignment.bus.code }} • {{ active_booking.seat_number }}{% else %}Waiting for booking{% endif %}</strong>
+                        <p>{% if active_booking %}Ready for frictionless boarding.{% else %}History remains below after each trip completes.{% endif %}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="glass-panel compact-list">
         <div class="section-header">
             <div>
-                <p class="eyebrow">My Booking</p>
-                <h3>{{ booking.route }}</h3>
-            </div>
-            <span class="status-chip success">{{ booking.status }}</span>
-        </div>
-
-        <div class="trip-meta">
-            <div><span>Seat</span><strong>{{ booking.seat }}</strong></div>
-            <div><span>Departure</span><strong>{{ booking.departure }}</strong></div>
-            <div><span>Boarding</span><strong>{{ booking.boarding_point }}</strong></div>
-        </div>
-    </div>
-
-    <div class="stack-column">
-        <div class="glass-panel selection-card">
-            <p class="eyebrow">Boarding Token</p>
-            <h3>{{ booking.token }}</h3>
-            <p>Your token is tied to your student booking and can be used at the bus gate scanner.</p>
-        </div>
-
-        <div class="glass-panel qr-preview">
-            <p class="eyebrow">Digital Pass</p>
-            <div class="token-card">
-                <div class="qr-grid" aria-hidden="true">
-                    <span></span><span></span><span></span><span></span>
-                    <span></span><span></span><span></span><span></span>
-                    <span></span><span></span><span></span><span></span>
-                    <span></span><span></span><span></span><span></span>
-                </div>
-                <div>
-                    <strong>{{ booking.token }}</strong>
-                    <p>Ready for frictionless boarding.</p>
-                </div>
+                <p class="eyebrow">Booking History</p>
+                <h3>Completed and cancelled trips</h3>
             </div>
         </div>
-    </div>
+        {% for booking in booking_history %}
+        <div class="list-row">
+            <div>
+                <strong>{{ booking.route_label }} • {{ booking.assignment.bus.code }} • Seat {{ booking.seat_number }}</strong>
+                <p>{{ booking.assignment.trip.service_date }} • {{ booking.assignment.trip.start_time|time:"g:i A" }} • {{ booking.runtime_status|title }}</p>
+            </div>
+            <span>{{ booking.token }}</span>
+        </div>
+        {% empty %}
+        <div class="list-row">
+            <div>
+                <strong>No booking history yet.</strong>
+                <p>Completed and cancelled trips will appear here automatically.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
 </section>
 {% endblock %}

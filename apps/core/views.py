@@ -4,6 +4,9 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import redirect, render
 from django.views.generic import FormView
 
+from apps.booking.services import get_dashboard_booking_context
+from apps.routing.services import get_current_driver_assignment
+
 from .auth_utils import get_post_login_url, get_safe_redirect
 from .decorators import role_required
 from .forms import LoginForm, StudentSignupForm
@@ -46,6 +49,10 @@ class StudentSignupView(FormView):
 
 
 def student_dashboard_view(request):
+    booking_context = get_dashboard_booking_context(request.user) if request.user.is_authenticated else {
+        "active_booking": None,
+        "booking_history": [],
+    }
     context = {
         "page_title": "Home",
         "page_name": "dashboard",
@@ -63,6 +70,7 @@ def student_dashboard_view(request):
             {"name": "Dormitory West", "eta": "8 min"},
             {"name": "Medical Center", "eta": "12 min"},
         ],
+        **booking_context,
     }
     return render(request, "core/student_dashboard.html", context)
 
@@ -73,17 +81,11 @@ def student_dashboard_view(request):
     denied_message="Only students can access booking details.",
 )
 def my_booking_view(request):
+    booking_context = get_dashboard_booking_context(request.user)
     context = {
         "page_title": "My Booking",
         "page_name": "my-booking",
-        "booking": {
-            "route": "Green Line Express",
-            "seat": "B3",
-            "departure": "08:05 AM",
-            "status": "Confirmed",
-            "token": "7X9-Q2A",
-            "boarding_point": "Central Library",
-        },
+        **booking_context,
     }
     return render(request, "core/my_booking.html", context)
 
@@ -94,20 +96,26 @@ def my_booking_view(request):
     denied_message="Only drivers can access assigned route data.",
 )
 def driver_dashboard_view(request):
+    assignment = get_current_driver_assignment(request.user)
     context = {
         "page_title": "My Assigned Route",
         "page_name": "driver-dashboard",
         "assignment": {
-            "route": "Campus Link South",
-            "bus_id": "BUS-17",
-            "shift": "07:30 AM - 02:00 PM",
+            "route": assignment.trip.route_label if assignment else "No trip assigned yet",
+            "bus_id": assignment.bus.code if assignment else "--",
+            "shift": (
+                f"{assignment.trip.start_time.strftime('%I:%M %p')} - {assignment.trip.end_time.strftime('%I:%M %p')}"
+                if assignment
+                else "Awaiting assignment"
+            ),
             "supervisor": "Transit Control",
-            "next_stop": "Business School",
+            "next_stop": assignment.trip.section_subtitle if assignment else "No active checkpoint",
         },
         "checkpoints": [
             {"label": "Fuel Level", "value": "68%", "detail": "Healthy range"},
-            {"label": "Trip Status", "value": "On Schedule", "detail": "No active delay"},
-            {"label": "Assigned Zone", "value": "South Corridor", "detail": "5 active stops"},
+            {"label": "Trip Status", "value": assignment.trip.status_label if assignment else "Idle", "detail": "Live from trip assignment"},
+            {"label": "Assigned Zone", "value": assignment.trip.section_subtitle if assignment else "No zone", "detail": "Derived from schedule section"},
         ],
+        "has_assignment": bool(assignment),
     }
     return render(request, "core/driver_dashboard.html", context)

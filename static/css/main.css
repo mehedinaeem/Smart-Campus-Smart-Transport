@@ -32,6 +32,12 @@ body {
         linear-gradient(135deg, #06101d 0%, #091524 42%, #0d1325 100%);
 }
 
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body.mobile-menu-open {
     overflow: hidden;
 }
@@ -175,6 +181,7 @@ body.mobile-menu-open {
     display: inline-flex;
     align-items: center;
     gap: 10px;
+    justify-self: end;
     flex-shrink: 0;
 }
 
@@ -363,6 +370,7 @@ body.mobile-menu-open {
     display: flex;
     flex-direction: column;
     gap: 24px;
+    min-width: 0;
     position: relative;
     z-index: 2;
 }
@@ -1099,7 +1107,8 @@ body.mobile-menu-open {
 }
 
 .tracking-layout {
-    grid-template-columns: minmax(0, 1.5fr) minmax(290px, 0.7fr);
+    grid-template-columns: minmax(0, 1.9fr) minmax(300px, 0.7fr);
+    align-items: start;
 }
 
 .trip-sidebar {
@@ -1164,8 +1173,46 @@ th {
     gap: 24px;
 }
 
+.alert-summary-grid,
+.alerts-filter-form,
+.alert-meta,
+.alert-head__badges {
+    display: grid;
+    gap: 16px;
+}
+
+.alert-summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.alerts-filter-form {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+}
+
+.alert-filter-select {
+    appearance: none;
+}
+
+.alerts-filter-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .schedule-layout,
-.insight-layout {
+.insight-layout,
+.role-admin-layout {
+    display: grid;
+    gap: 24px;
+}
+
+.schedule-hero,
+.schedule-sections,
+.schedule-vehicle-grid,
+.schedule-route-grid,
+.schedule-notes-grid {
     display: grid;
     gap: 24px;
 }
@@ -1177,12 +1224,233 @@ th {
     gap: 24px;
 }
 
+.schedule-hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    padding: 28px;
+}
+
+.schedule-hero p {
+    max-width: 72ch;
+}
+
+.schedule-sections {
+    grid-template-columns: 1fr;
+}
+
+.schedule-section-panel {
+    padding: 28px;
+}
+
+.schedule-vehicle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 22px;
+}
+
+.schedule-vehicle-card,
+.schedule-support-panel {
+    padding: 22px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.schedule-vehicle-head {
+    margin-bottom: 18px;
+}
+
+.schedule-vehicle-head h4,
+.schedule-support-panel h3 {
+    margin: 6px 0 0;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 1.35rem;
+}
+
+.schedule-route-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.schedule-route-block {
+    padding: 18px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(97, 168, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.schedule-route-block strong {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 1rem;
+}
+
+.schedule-time-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.schedule-time-list li {
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(7, 17, 31, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(239, 245, 255, 0.94);
+}
+
+.schedule-notes-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.schedule-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    align-items: end;
+    gap: 24px;
+    padding: 22px;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.schedule-footer h3 {
+    margin: 6px 0 10px;
+    font-family: "Space Grotesk", sans-serif;
+}
+
+.schedule-footer__meta {
+    display: grid;
+    gap: 14px;
+}
+
+.schedule-footer__meta div {
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(97, 168, 255, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.schedule-footer__meta strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
 .alerts-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.role-admin-hero,
+.role-admin-summary,
+.role-card-list {
+    display: grid;
+    gap: 24px;
+}
+
+.role-admin-hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    padding: 28px;
+}
+
+.role-admin-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.role-admin-panel {
+    padding: 28px;
+}
+
+.role-admin-header {
+    gap: 18px;
+    margin-bottom: 22px;
+}
+
+.role-search-form {
+    width: min(100%, 360px);
+}
+
+.role-admin-table table {
+    min-width: 760px;
+}
+
+.role-inline-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.role-select {
+    min-width: 140px;
+    color: var(--text);
+    background-color: rgba(21, 34, 59, 0.98);
+}
+
+.role-select option {
+    color: #020c1c;
+    background: #8fb2e0;
+}
+
+.role-update-btn {
+    min-height: 48px;
+    padding-inline: 18px;
+}
+
+.role-lock-note {
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.role-card-list {
+    display: none;
+}
+
+.role-user-card {
+    padding: 20px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.role-user-card__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.role-user-card__head p,
+.role-user-card__meta,
+.role-empty-state p {
+    margin: 6px 0 0;
+    color: var(--muted);
+}
+
+.role-inline-form--stacked {
+    display: grid;
+    margin-top: 16px;
+}
+
+.role-empty-state {
+    padding: 8px 4px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 .alert-card {
     position: relative;
+    padding: 24px;
 }
 
 .alert-card::before {
@@ -1201,8 +1469,29 @@ th {
 .alert-head {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 16px;
     margin-bottom: 24px;
+}
+
+.alert-head__badges {
+    grid-template-columns: repeat(3, max-content);
+}
+
+.alert-meta {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.alert-empty-state {
+    padding: 28px;
+}
+
+.alert-empty-state h3 {
+    margin: 6px 0 10px;
+    font-family: "Space Grotesk", sans-serif;
 }
 
 .modal-backdrop {
@@ -1237,6 +1526,165 @@ th {
     cursor: pointer;
 }
 
+.secondary-btn,
+.table-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    text-decoration: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+.secondary-btn:hover,
+.table-action-btn:hover,
+.table-action-link:hover {
+    background: rgba(255, 255, 255, 0.09);
+}
+
+.trip-admin-layout {
+    display: grid;
+    gap: 24px;
+}
+
+.trip-admin-layout .role-admin-hero {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 28px;
+}
+
+.trip-admin-layout .role-admin-hero > * {
+    min-width: 0;
+}
+
+.trip-admin-form,
+.trip-form-grid,
+.assignment-form-list {
+    display: grid;
+    gap: 16px;
+}
+
+.trip-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 18px;
+}
+
+.form-field,
+.assignment-delete {
+    display: grid;
+    gap: 8px;
+}
+
+.form-field span,
+.assignment-delete span {
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(12, 22, 41, 0.95);
+    color: var(--text);
+    font: inherit;
+}
+
+.form-field textarea {
+    min-height: 108px;
+    resize: vertical;
+}
+
+.assignment-form-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 100px;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.assignment-delete {
+    align-content: center;
+}
+
+.assignment-delete input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+.trip-admin-form .section-header {
+    margin-top: 8px;
+}
+
+.trip-admin-form .errorlist,
+.trip-admin-form .errorlist li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.trip-admin-form .errorlist {
+    color: #ffb4c0;
+    font-size: 0.88rem;
+}
+
+.trip-form-actions,
+.trip-action-cell {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.table-action-link {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.table-action-btn.warning {
+    color: #fff6cf;
+    border-color: rgba(251, 191, 36, 0.22);
+    background: rgba(251, 191, 36, 0.12);
+}
+
+.booking-trip-list {
+    display: grid;
+    gap: 12px;
+}
+
+.booking-trip-row,
+.tracking-trip-row {
+    text-decoration: none;
+    color: inherit;
+    border-radius: 18px;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.booking-trip-row.active,
+.tracking-trip-row.active {
+    background: rgba(97, 168, 255, 0.08);
+    border-color: rgba(97, 168, 255, 0.28);
+}
+
+.booking-trip-row:hover,
+.tracking-trip-row:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.04);
+}
+
 @keyframes pulse {
     0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.45); }
     70% { box-shadow: 0 0 0 12px rgba(52, 211, 153, 0); }
@@ -1248,11 +1696,19 @@ th {
     .hero-grid,
     .booking-layout,
     .tracking-layout,
+    .alert-summary-grid,
+    .alerts-filter-form,
     .summary-grid,
     .analytics-grid,
     .dashboard-strip,
     .alerts-grid,
     .schedule-grid,
+    .schedule-hero,
+    .schedule-vehicle-grid,
+    .schedule-route-grid,
+    .schedule-footer,
+    .role-admin-hero,
+    .role-admin-summary,
     .insight-grid {
         grid-template-columns: 1fr;
     }
@@ -1263,25 +1719,43 @@ th {
     }
 
     .map-stats,
-    .trip-meta {
+    .trip-meta,
+    .alert-meta {
         grid-template-columns: 1fr;
     }
 }
 
 @media (max-width: 760px) {
     .mobile-topbar {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 48px;
         position: sticky;
         top: 0;
         z-index: 240;
+        align-items: center;
+        justify-content: initial;
         margin: 0;
         padding: 14px 18px;
-        width: 100%;
+        width: 100vw;
+        max-width: 100vw;
         border-radius: 0;
         background: linear-gradient(180deg, rgba(15, 27, 50, 0.98), rgba(10, 20, 39, 0.98));
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
         box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
+    }
+
+    .mobile-brand {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .mobile-topbar__actions {
+        position: static;
+        width: 48px;
+        min-width: 48px;
+        justify-content: flex-end;
+        transform: none;
     }
 
     .mobile-menu-backdrop {
@@ -1296,6 +1770,7 @@ th {
         padding: 0;
         gap: 16px;
         z-index: auto;
+        min-width: 0;
     }
 
     .sidebar {
@@ -1332,6 +1807,7 @@ th {
 
     .sidebar-mobile-bar {
         display: flex;
+        align-items: center;
         justify-content: flex-end;
         margin-bottom: 18px;
         padding-bottom: 18px;
@@ -1436,7 +1912,82 @@ th {
         grid-template-columns: 1fr;
     }
 
+    .section-header {
+        grid-template-columns: 1fr;
+        align-items: flex-start;
+    }
+
+    .section-header > * {
+        min-width: 0;
+    }
+
+    .status-chip {
+        justify-self: flex-start;
+        max-width: 100%;
+    }
+
+    .table-shell {
+        max-width: 100%;
+    }
+
+    .summary-grid,
+    .analytics-grid,
+    .trips-panel,
+    .alert-head__badges {
+        min-width: 0;
+    }
+
+    .alerts-filter-actions {
+        display: grid;
+    }
+
+    .alerts-filter-actions .primary-btn,
+    .alerts-filter-actions .secondary-btn {
+        width: 100%;
+    }
+
+    .schedule-section-panel,
+    .schedule-hero,
+    .schedule-vehicle-card,
+    .schedule-footer,
+    .role-admin-panel,
+    .role-admin-hero {
+        padding: 20px;
+    }
+
+    .role-admin-header {
+        margin-bottom: 18px;
+    }
+
+    .role-search-form {
+        width: 100%;
+    }
+
+    .role-admin-table {
+        display: none;
+    }
+
+    .role-card-list {
+        display: grid;
+        gap: 16px;
+    }
+
+    .role-inline-form {
+        display: grid;
+        align-items: stretch;
+    }
+
+    .role-select,
+    .role-update-btn {
+        width: 100%;
+    }
+
     .seat-layout {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .trip-form-grid,
+    .assignment-form-row {
+        grid-template-columns: 1fr;
     }
 }
