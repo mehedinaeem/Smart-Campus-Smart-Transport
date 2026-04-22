@@ -3,20 +3,131 @@
 {% block content %}
 <section class="alerts-layout">
     <div class="glass-panel alerts-hero">
-        <p class="eyebrow">Monitoring Center</p>
-        <h3>Operational alerts with clear priority</h3>
-        <p>Critical anomalies are elevated visually so administrators can spot route risk, fuel variance, and sensor health in seconds.</p>
+        <div class="section-header">
+            <div>
+                <p class="eyebrow">Monitoring Center</p>
+                <h3>Operational alerts driven by live project data</h3>
+                <p>Trips, bookings, bus activity, telemetry snapshots, and fuel readings are now combined into a single admin monitoring surface.</p>
+            </div>
+            <span class="status-chip {% if summary.critical %}warning{% else %}success{% endif %}">{{ matched_alert_count }} alert{{ matched_alert_count|pluralize }} visible</span>
+        </div>
     </div>
+
+    <section class="alert-summary-grid">
+        <article class="glass-panel summary-card">
+            <span>Total Alerts</span>
+            <h3>{{ summary.total }}</h3>
+            <p>Generated from current system records.</p>
+        </article>
+        <article class="glass-panel summary-card">
+            <span>Critical</span>
+            <h3>{{ summary.critical }}</h3>
+            <p>Immediate operational attention needed.</p>
+        </article>
+        <article class="glass-panel summary-card">
+            <span>Warning</span>
+            <h3>{{ summary.warning }}</h3>
+            <p>Pressure building on service health.</p>
+        </article>
+        <article class="glass-panel summary-card">
+            <span>Healthy / Info</span>
+            <h3>{{ summary.success|add:summary.info }}</h3>
+            <p>Recovered or stable routes remain visible.</p>
+        </article>
+    </section>
+
+    <section class="glass-panel role-admin-panel">
+        <div class="role-admin-header">
+            <div>
+                <p class="eyebrow">Search & Filter</p>
+                <h3>Focus the monitoring feed</h3>
+                <p>{% if active_filter_count %}{{ active_filter_count }} active filter{{ active_filter_count|pluralize }} applied.{% else %}Filter by route, bus, severity, type, or alert status.{% endif %}</p>
+            </div>
+        </div>
+
+        <form method="get" class="alerts-filter-form">
+            <label class="form-field">
+                <span>Search</span>
+                <input class="auth-input" type="search" name="q" value="{{ filters.q }}" placeholder="Search route, bus, title, or message">
+            </label>
+            <label class="form-field">
+                <span>Severity</span>
+                <select class="auth-input alert-filter-select" name="severity">
+                    <option value="">All severities</option>
+                    {% for value, label in severity_options %}
+                    <option value="{{ value }}" {% if filters.severity == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-field">
+                <span>Type</span>
+                <select class="auth-input alert-filter-select" name="type">
+                    <option value="">All types</option>
+                    {% for value, label in type_options %}
+                    <option value="{{ value }}" {% if filters.type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-field">
+                <span>Status</span>
+                <select class="auth-input alert-filter-select" name="status">
+                    <option value="">All statuses</option>
+                    {% for value, label in status_options %}
+                    <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-field">
+                <span>Route</span>
+                <select class="auth-input alert-filter-select" name="route">
+                    <option value="">All routes</option>
+                    {% for route in route_options %}
+                    <option value="{{ route.id }}" {% if filters.route == route.id|stringformat:'s' %}selected{% endif %}>{{ route.label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <label class="form-field">
+                <span>Bus</span>
+                <select class="auth-input alert-filter-select" name="bus">
+                    <option value="">All buses</option>
+                    {% for bus in bus_options %}
+                    <option value="{{ bus.id }}" {% if filters.bus == bus.id|stringformat:'s' %}selected{% endif %}>{{ bus.code }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <div class="alerts-filter-actions">
+                <button class="primary-btn" type="submit">Apply Filters</button>
+                {% if active_filter_count %}
+                <a class="secondary-btn" href="{% url 'alerts-monitoring' %}">Reset</a>
+                {% endif %}
+            </div>
+        </form>
+    </section>
 
     <div class="alerts-grid">
         {% for alert in alerts %}
-        <article class="glass-panel alert-card {{ alert.level }}">
+        <article class="glass-panel alert-card {{ alert.severity }}">
             <div class="alert-head">
-                <span class="table-badge {{ alert.level }}">{{ alert.level|title }}</span>
-                <span class="alert-time">Now</span>
+                <div class="alert-head__badges">
+                    <span class="table-badge {{ alert.severity }}">{{ alert.severity_label }}</span>
+                    <span class="table-badge neutral">{{ alert.alert_type_label }}</span>
+                    <span class="table-badge neutral">{{ alert.status_label }}</span>
+                </div>
+                <span class="alert-time">{{ alert.timestamp|date:"M j, g:i A" }}</span>
             </div>
             <h3>{{ alert.title }}</h3>
-            <p>{{ alert.detail }}</p>
+            <p>{{ alert.message }}</p>
+            <div class="alert-meta">
+                <span><strong>Route:</strong> {{ alert.route_label }}</span>
+                <span><strong>Bus:</strong> {{ alert.bus_code }}</span>
+                <span><strong>Trip:</strong> {{ alert.trip_status }}</span>
+            </div>
+        </article>
+        {% empty %}
+        <article class="glass-panel alert-empty-state">
+            <p class="eyebrow">No Matches</p>
+            <h3>No alerts match the current filter set.</h3>
+            <p>Try widening the search or clearing one of the filters to see more operational signals.</p>
         </article>
         {% endfor %}
     </div>

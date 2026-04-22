@@ -1173,6 +1173,34 @@ th {
     gap: 24px;
 }
 
+.alert-summary-grid,
+.alerts-filter-form,
+.alert-meta,
+.alert-head__badges {
+    display: grid;
+    gap: 16px;
+}
+
+.alert-summary-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.alerts-filter-form {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+}
+
+.alert-filter-select {
+    appearance: none;
+}
+
+.alerts-filter-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .schedule-layout,
 .insight-layout,
 .role-admin-layout {
@@ -1422,6 +1450,7 @@ th {
 
 .alert-card {
     position: relative;
+    padding: 24px;
 }
 
 .alert-card::before {
@@ -1440,8 +1469,29 @@ th {
 .alert-head {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 16px;
     margin-bottom: 24px;
+}
+
+.alert-head__badges {
+    grid-template-columns: repeat(3, max-content);
+}
+
+.alert-meta {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.alert-empty-state {
+    padding: 28px;
+}
+
+.alert-empty-state h3 {
+    margin: 6px 0 10px;
+    font-family: "Space Grotesk", sans-serif;
 }
 
 .modal-backdrop {
@@ -1646,6 +1696,8 @@ th {
     .hero-grid,
     .booking-layout,
     .tracking-layout,
+    .alert-summary-grid,
+    .alerts-filter-form,
     .summary-grid,
     .analytics-grid,
     .dashboard-strip,
@@ -1667,7 +1719,8 @@ th {
     }
 
     .map-stats,
-    .trip-meta {
+    .trip-meta,
+    .alert-meta {
         grid-template-columns: 1fr;
     }
 }
@@ -1879,8 +1932,18 @@ th {
 
     .summary-grid,
     .analytics-grid,
-    .trips-panel {
+    .trips-panel,
+    .alert-head__badges {
         min-width: 0;
+    }
+
+    .alerts-filter-actions {
+        display: grid;
+    }
+
+    .alerts-filter-actions .primary-btn,
+    .alerts-filter-actions .secondary-btn {
+        width: 100%;
     }
 
     .schedule-section-panel,

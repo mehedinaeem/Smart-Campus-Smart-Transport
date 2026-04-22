@@ -2,6 +2,8 @@ from django.shortcuts import render
 
 from apps.core.decorators import role_required
 
+from .services import build_alert_summary, filter_operational_alerts, generate_operational_alerts, get_alert_filter_options
+
 
 @role_required(
     "admin",
@@ -9,14 +11,28 @@ from apps.core.decorators import role_required
     denied_message="Admin access is required for alerts and monitoring.",
 )
 def alerts_monitoring_view(request):
+    filters = {
+        "q": request.GET.get("q", "").strip(),
+        "severity": request.GET.get("severity", "").strip(),
+        "type": request.GET.get("type", "").strip(),
+        "status": request.GET.get("status", "").strip(),
+        "route": request.GET.get("route", "").strip(),
+        "bus": request.GET.get("bus", "").strip(),
+    }
+
+    all_alerts = generate_operational_alerts()
+    filtered_alerts = filter_operational_alerts(alerts=all_alerts, filters=filters)
+    filter_options = get_alert_filter_options()
+    active_filter_count = sum(1 for value in filters.values() if value)
+
     context = {
         "page_title": "Alerts & Monitoring",
         "page_name": "alerts",
-        "alerts": [
-            {"level": "critical", "title": "Fuel variance detected", "detail": "BUS-11 exceeded expected consumption by 18% on the Medical Shuttle route."},
-            {"level": "warning", "title": "Traffic pressure rising", "detail": "South Gate corridor moved to heavy congestion for the next 25 minutes."},
-            {"level": "success", "title": "Route health stable", "detail": "North Loop completed 14 uninterrupted trips with no late arrivals."},
-            {"level": "info", "title": "Sensor sync restored", "detail": "Real-time telemetry resumed for BUS-06 after a 2-minute packet loss."},
-        ],
+        "alerts": filtered_alerts,
+        "filters": filters,
+        "summary": build_alert_summary(all_alerts),
+        "matched_alert_count": len(filtered_alerts),
+        "active_filter_count": active_filter_count,
+        **filter_options,
     }
     return render(request, "fuel/alerts_monitoring.html", context)
