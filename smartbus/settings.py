@@ -26,7 +26,11 @@ SECRET_KEY = 'django-insecure-f&t19=n#jn=to#-%@dsayegbfv*z3bu1#lfgm&&!qrzrmn-*2s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+    if host.strip()
+]
 
 
 # Application definition
@@ -137,6 +141,10 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "true").lower() == "true"
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Smart Campus <no-reply@smartcampus.local>")
+TRACKING_SHARED_API_KEY = os.environ.get("TRACKING_SHARED_API_KEY", "")
+TRACKING_ONLINE_WINDOW_SECONDS = int(os.environ.get("TRACKING_ONLINE_WINDOW_SECONDS", "75"))
+TRACKING_OFFLINE_WINDOW_SECONDS = int(os.environ.get("TRACKING_OFFLINE_WINDOW_SECONDS", "240"))
+TRACKING_SNAPSHOT_INTERVAL_SECONDS = int(os.environ.get("TRACKING_SNAPSHOT_INTERVAL_SECONDS", "60"))
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

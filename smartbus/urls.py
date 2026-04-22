@@ -28,7 +28,7 @@ from apps.core.views import (
 from apps.dashboard.views import admin_dashboard_view, analytics_view, manage_roles_view, trip_assignments_view
 from apps.fuel.views import alerts_monitoring_view
 from apps.routing.views import bus_schedule_view
-from apps.tracking.views import live_tracking_view
+from apps.tracking.views import live_tracking_feed_view, live_tracking_view, telemetry_ingest_view
 
 urlpatterns = [
     path('system-admin/', admin.site.urls),
@@ -39,6 +39,8 @@ urlpatterns = [
     path('booking/', seat_booking_view, name='seat-booking'),
     path('my-booking/', my_booking_view, name='my-booking'),
     path('tracking/', live_tracking_view, name='live-tracking'),
+    path('api/tracking/live/', live_tracking_feed_view, name='live-tracking-feed'),
+    path('api/device/telemetry/', telemetry_ingest_view, name='telemetry-ingest'),
     path('driver/', driver_dashboard_view, name='driver-dashboard'),
     path('schedule/', bus_schedule_view, name='bus-schedule'),
     path('admin/', admin_dashboard_view, name='admin-dashboard'),

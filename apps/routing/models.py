@@ -43,6 +43,22 @@ class Route(models.Model):
         return self.label
 
 
+class RouteStop(models.Model):
+    route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name="stops")
+    name = models.CharField(max_length=160)
+    sequence = models.PositiveIntegerField(default=0)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    eta_offset_minutes = models.PositiveIntegerField(blank=True, null=True)
+
+    class Meta:
+        ordering = ["route__display_order", "sequence", "id"]
+        unique_together = [("route", "sequence")]
+
+    def __str__(self):
+        return f"{self.route.label} - {self.name}"
+
+
 class ScheduleSlot(models.Model):
     route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name="schedule_slots")
     departure_time = models.TimeField()

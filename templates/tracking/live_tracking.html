@@ -1,83 +1,177 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+>
+{% endblock %}
 
 {% block content %}
 <section class="tracking-layout">
-    <div class="glass-panel tracking-map-panel">
-        <div class="section-header">
-            <div>
-                <p class="eyebrow">Full Screen Tracking</p>
-                <h3>{{ trip.route }}</h3>
+    <div class="glass-panel tracking-live-panel">
+        <div class="tracking-live-head">
+            <div class="section-header">
+                <div>
+                    <p class="eyebrow">Live Fleet Map</p>
+                    <h3 id="tracking-route-label">{% if selected_vehicle %}{{ selected_vehicle.route_label }}{% else %}No active or upcoming trips{% endif %}</h3>
+                </div>
+                <span class="status-chip {% if selected_vehicle %}{{ selected_vehicle.live_status_tone }}{% endif %}" id="tracking-status-chip">
+                    {% if selected_vehicle %}{{ selected_vehicle.live_status }}{% else %}Unavailable{% endif %}
+                </span>
             </div>
-            <span class="status-chip success">{{ trip.status }}</span>
-        </div>
-        <div class="tracking-map" data-map-surface>
-            <div class="route route-main route-wide"></div>
-            <div class="route-highlight"></div>
-            <div class="stop-pin pin-one"></div>
-            <div class="stop-pin pin-two"></div>
-            <div class="stop-pin pin-three"></div>
-            <div class="stop-pin pin-four"></div>
-            <div class="moving-bus live-bus" id="live-bus-marker"><span>BUS</span></div>
-        </div>
-        <div class="trip-meta">
-            <div>
-                <span>Driver</span>
-                <strong>{{ trip.driver }}</strong>
-            </div>
-            <div>
-                <span>Vehicle</span>
-                <strong>{{ trip.bus_id }}</strong>
-            </div>
-            <div>
-                <span>Speed</span>
-                <strong>{{ trip.speed }}</strong>
-            </div>
-            <div>
-                <span>ETA</span>
-                <strong>{{ trip.eta }}</strong>
-            </div>
-        </div>
-        <div class="section-header">
-            <div>
-                <p class="eyebrow">Stops</p>
-                <h3>Route sequence</h3>
+
+            <div class="tracking-summary-grid">
+                <div class="tracking-summary-card">
+                    <span>Bus</span>
+                    <strong id="tracking-bus-code">{% if selected_vehicle %}{{ selected_vehicle.bus_code }}{% else %}--{% endif %}</strong>
+                    <small id="tracking-bus-route">{% if selected_vehicle %}{{ selected_vehicle.route_section }}{% else %}Waiting for assigned trips{% endif %}</small>
+                </div>
+                <div class="tracking-summary-card">
+                    <span>Speed</span>
+                    <strong id="tracking-speed">{% if selected_vehicle and selected_vehicle.speed_kph is not None %}{{ selected_vehicle.speed_kph }} km/h{% else %}--{% endif %}</strong>
+                    <small>From latest GPS payload</small>
+                </div>
+                <div class="tracking-summary-card">
+                    <span>ETA</span>
+                    <strong id="tracking-eta">{% if selected_vehicle %}{{ selected_vehicle.eta_label }}{% else %}--{% endif %}</strong>
+                    <small>Ready for route timing logic</small>
+                </div>
+                <div class="tracking-summary-card">
+                    <span>Last update</span>
+                    <strong id="tracking-last-update">{% if selected_vehicle %}{{ selected_vehicle.last_reported_label }}{% else %}No telemetry yet{% endif %}</strong>
+                    <small id="tracking-trip-status">{% if selected_vehicle %}Trip {{ selected_vehicle.trip_status_label }}{% else %}Trips appear here once assigned{% endif %}</small>
+                </div>
             </div>
         </div>
-        {% for stop in stops %}
-        <div class="timeline-stop">
-            <div class="timeline-dot"></div>
-            <div>
-                <strong>{{ stop }}</strong>
-                <p>Live checkpoint enabled</p>
+
+        <div
+            class="tracking-map-shell"
+            data-tracking-app
+            data-feed-url="{% url 'live-tracking-feed' %}"
+            data-selected-assignment="{% if tracking_payload.selected_assignment_id %}{{ tracking_payload.selected_assignment_id }}{% endif %}"
+        >
+            <div class="tracking-map" id="live-tracking-map"></div>
+            <div class="tracking-map-overlay" id="tracking-map-overlay" {% if tracking_payload.has_assignments %}hidden{% endif %}>
+                <div class="tracking-empty-state">
+                    <p class="eyebrow">Live Tracking</p>
+                    <h3>No active or upcoming trips</h3>
+                    <p>Once an admin assigns buses to scheduled or active trips, live telemetry will appear here automatically.</p>
+                </div>
             </div>
         </div>
-        {% endfor %}
+
+        <div class="tracking-detail-grid">
+            <article class="glass-subpanel tracking-info-card">
+                <div class="section-header">
+                    <div>
+                        <p class="eyebrow">Selected Vehicle</p>
+                        <h3 id="tracking-panel-title">{% if selected_vehicle %}{{ selected_vehicle.bus_label }}{% else %}No live vehicle selected{% endif %}</h3>
+                    </div>
+                </div>
+
+                <div class="tracking-info-stack">
+                    <div class="tracking-info-row">
+                        <span>Driver</span>
+                        <strong id="tracking-driver">{% if selected_vehicle %}{{ selected_vehicle.driver_name }}{% else %}Unassigned{% endif %}</strong>
+                    </div>
+                    <div class="tracking-info-row">
+                        <span>Trip Window</span>
+                        <strong id="tracking-window">{% if selected_vehicle %}{{ selected_vehicle.start_time }} - {{ selected_vehicle.end_time }}{% else %}--{% endif %}</strong>
+                    </div>
+                    <div class="tracking-info-row">
+                        <span>Occupancy</span>
+                        <strong id="tracking-occupancy">{% if selected_vehicle %}{{ selected_vehicle.occupancy_label }}{% else %}--{% endif %}</strong>
+                    </div>
+                    <div class="tracking-info-row">
+                        <span>Ignition</span>
+                        <strong id="tracking-ignition">{% if selected_vehicle and selected_vehicle.ignition_on is not None %}{% if selected_vehicle.ignition_on %}On{% else %}Off{% endif %}{% else %}Unknown{% endif %}</strong>
+                    </div>
+                    <div class="tracking-info-row">
+                        <span>Coordinates</span>
+                        <strong id="tracking-coordinates">{% if selected_vehicle and selected_vehicle.latitude is not None %}{{ selected_vehicle.latitude }}, {{ selected_vehicle.longitude }}{% else %}Waiting for GPS fix{% endif %}</strong>
+                    </div>
+                </div>
+            </article>
+
+            <article class="glass-subpanel tracking-stops-card">
+                <div class="section-header">
+                    <div>
+                        <p class="eyebrow">Route Sequence</p>
+                        <h3>Stops and checkpoints</h3>
+                    </div>
+                </div>
+                <div id="tracking-stops-list" class="tracking-stop-list">
+                    {% if selected_vehicle and selected_vehicle.stops %}
+                        {% for stop in selected_vehicle.stops %}
+                        <div class="timeline-stop">
+                            <div class="timeline-dot"></div>
+                            <div>
+                                <strong>{{ stop.name }}</strong>
+                                <p>{{ stop.eta_label }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="tracking-inline-empty">
+                        <strong>No stop coordinates yet.</strong>
+                        <p>Add route stops in the admin to unlock stop sequencing and route polyline rendering.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </article>
+        </div>
     </div>
 
-    <aside class="glass-panel trip-sidebar">
+    <aside class="glass-panel trip-sidebar tracking-sidebar">
         <div class="section-header">
             <div>
                 <p class="eyebrow">Assigned Trips</p>
                 <h3>Upcoming and active buses</h3>
             </div>
         </div>
-        {% for assignment in assignments %}
-        <a class="timeline-stop tracking-trip-row {% if selected_assignment and assignment.pk == selected_assignment.pk %}active{% endif %}" href="{% url 'live-tracking' %}?assignment={{ assignment.pk }}">
-            <div class="timeline-dot"></div>
-            <div>
-                <strong>{{ assignment.trip.route_label }}</strong>
-                <p>{{ assignment.bus.code }} | {{ assignment.trip.start_time|time:"g:i A" }} | {{ assignment.trip.status_label }}</p>
-            </div>
-        </a>
-        {% empty %}
-        <div class="timeline-stop">
-            <div class="timeline-dot"></div>
-            <div>
-                <strong>No active or upcoming trips.</strong>
-                <p>Trips appear here only while they are upcoming or active.</p>
-            </div>
+
+        <div class="tracking-refresh-note">
+            <span class="pulse-dot"></span>
+            <strong>Smooth polling enabled</strong>
+            <p>The map refreshes automatically and keeps focus on active or upcoming assignments only.</p>
         </div>
-        {% endfor %}
+
+        <div id="tracking-vehicle-list" class="booking-trip-list">
+            {% for vehicle in tracking_payload.vehicles %}
+            <button
+                type="button"
+                class="timeline-stop tracking-trip-row {% if tracking_payload.selected_assignment_id == vehicle.assignment_id %}active{% endif %}"
+                data-assignment-option
+                data-assignment-id="{{ vehicle.assignment_id }}"
+            >
+                <div class="timeline-dot"></div>
+                <div>
+                    <strong>{{ vehicle.route_label }}</strong>
+                    <p>{{ vehicle.bus_code }} | {{ vehicle.start_time }} | {{ vehicle.live_status }}</p>
+                </div>
+            </button>
+            {% empty %}
+            <div class="tracking-inline-empty">
+                <strong>No active or upcoming trips.</strong>
+                <p>Completed or cancelled trips are intentionally excluded from live tracking.</p>
+            </div>
+            {% endfor %}
+        </div>
     </aside>
 </section>
+
+{{ tracking_payload|json_script:"tracking-payload" }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+></script>
+<script src="{% static 'js/tracking_live.js' %}"></script>
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Bus, Route, ScheduleSection, ScheduleSlot, Trip, TripBusAssignment, VehicleGroup
+from .models import Bus, Route, RouteStop, ScheduleSection, ScheduleSlot, Trip, TripBusAssignment, VehicleGroup
 
 
 class ScheduleSlotInline(admin.TabularInline):
@@ -8,11 +8,16 @@ class ScheduleSlotInline(admin.TabularInline):
     extra = 0
 
 
+class RouteStopInline(admin.TabularInline):
+    model = RouteStop
+    extra = 0
+
+
 @admin.register(Route)
 class RouteAdmin(admin.ModelAdmin):
     list_display = ("label", "group", "display_order")
     list_filter = ("group__section", "group")
-    inlines = [ScheduleSlotInline]
+    inlines = [ScheduleSlotInline, RouteStopInline]
 
 
 @admin.register(ScheduleSection)
