@@ -870,6 +870,40 @@ body.mobile-menu-open {
     min-height: 540px;
 }
 
+.home-live-map {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.home-map-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.home-map-badge {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(10, 19, 37, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.22);
+}
+
+.home-map-badge strong,
+.home-map-badge p {
+    display: block;
+}
+
+.home-map-badge p {
+    margin-top: 4px;
+    color: var(--muted);
+}
+
 .map-empty-state {
     position: absolute;
     inset: 24px;
@@ -881,6 +915,25 @@ body.mobile-menu-open {
     border-radius: 20px;
     background: rgba(5, 11, 23, 0.48);
     border: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.faux-map .leaflet-control-container,
+.faux-map .leaflet-popup-close-button,
+.faux-map .leaflet-bottom,
+.faux-map .leaflet-top {
+    display: none;
+}
+
+.faux-map .leaflet-pane,
+.faux-map .leaflet-control {
+    z-index: 2;
+}
+
+.faux-map .leaflet-popup-content-wrapper,
+.faux-map .leaflet-popup-tip {
+    background: rgba(10, 19, 37, 0.92);
+    color: #eff5ff;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.26);
 }
 
 .route,

@@ -308,12 +308,29 @@ def _build_live_fleet_card(active_assignment, latest_location, latest_telemetry,
             "bus_label": None,
             "map_stops": [],
             "empty_message": "No active trips",
+            "latitude": None,
+            "longitude": None,
+            "route_points": [],
+            "stops_payload": [],
         }
 
     stops = _get_stops_for_assignment(active_assignment)
     current_stop, nearest_distance = _get_nearest_stop(stops, latest_location)
     next_stop = _get_next_stop(stops, current_stop, active_assignment.trip.effective_status)
     eta_minutes = _estimate_eta_minutes(location=latest_location, target_stop=next_stop, current_stop=current_stop)
+    stops_payload = [
+        {
+            "name": stop.name,
+            "latitude": float(stop.latitude) if stop.latitude is not None else None,
+            "longitude": float(stop.longitude) if stop.longitude is not None else None,
+        }
+        for stop in stops
+    ]
+    route_points = [
+        [stop_data["latitude"], stop_data["longitude"]]
+        for stop_data in stops_payload
+        if stop_data["latitude"] is not None and stop_data["longitude"] is not None
+    ]
     traffic_label, traffic_tone = _get_traffic_status(
         latest_location=latest_location,
         latest_telemetry=latest_telemetry,
@@ -334,6 +351,10 @@ def _build_live_fleet_card(active_assignment, latest_location, latest_telemetry,
         "route_label": active_assignment.trip.route_label,
         "bus_label": active_assignment.bus.code,
         "map_stops": _build_map_stop_labels(stops, current_stop, next_stop),
+        "latitude": float(latest_location.latitude) if latest_location else None,
+        "longitude": float(latest_location.longitude) if latest_location else None,
+        "route_points": route_points,
+        "stops_payload": stops_payload,
         "current_stop": current_stop,
         "next_stop": next_stop,
         "upcoming_stops": _build_upcoming_stops(
@@ -377,6 +398,31 @@ def _build_next_arrival_card(next_assignment):
         "bus_code": next_assignment.bus.code,
         "route_name": next_assignment.trip.route_label,
     }
+
+
+def _assignment_sort_key_for_live_home(assignment, latest_locations, latest_bus_locations, now):
+    location = _get_latest_location_for_assignment(assignment, latest_locations, latest_bus_locations)
+    location_priority = 0 if location else 1
+    if assignment.runtime_status == Trip.STATUS_ACTIVE:
+        status_priority = 0
+    elif assignment.runtime_status == Trip.STATUS_BOOKING_OPEN:
+        status_priority = 1
+    else:
+        status_priority = 2
+
+    if location:
+        freshness = abs((now - location.recorded_at).total_seconds())
+    else:
+        freshness = float("inf")
+
+    start_delta = abs((assignment.trip.start_at - now).total_seconds())
+    return (
+        status_priority,
+        location_priority,
+        freshness,
+        start_delta,
+        assignment.bus.code,
+    )
 
 
 def _build_info_cards(*, focus_assignment, active_assignments, scheduled_assignments):
@@ -467,22 +513,41 @@ def get_student_dashboard_snapshot(*, now=None):
         if assignment.runtime_status in {Trip.STATUS_ACTIVE, Trip.STATUS_BOOKING_OPEN, Trip.STATUS_SCHEDULED}
     ]
     active_assignments.sort(
-        key=lambda assignment: (
-            _get_latest_location_for_assignment(assignment, latest_locations, latest_bus_locations) is None,
-            assignment.trip.start_at,
-            assignment.bus.code,
+        key=lambda assignment: _assignment_sort_key_for_live_home(
+            assignment,
+            latest_locations,
+            latest_bus_locations,
+            now,
         )
     )
     scheduled_assignments.sort(key=lambda assignment: (assignment.trip.start_at, assignment.bus.code))
 
     active_assignment = active_assignments[0] if active_assignments else None
-    if active_assignment:
-        active_location = _get_latest_location_for_assignment(active_assignment, latest_locations, latest_bus_locations)
+    live_home_assignment = active_assignment
+    if not live_home_assignment and scheduled_assignments:
+        live_home_candidates = [
+            assignment
+            for assignment in scheduled_assignments
+            if _get_latest_location_for_assignment(assignment, latest_locations, latest_bus_locations)
+        ]
+        if live_home_candidates:
+            live_home_candidates.sort(
+                key=lambda assignment: _assignment_sort_key_for_live_home(
+                    assignment,
+                    latest_locations,
+                    latest_bus_locations,
+                    now,
+                )
+            )
+            live_home_assignment = live_home_candidates[0]
+
+    if live_home_assignment:
+        active_location = _get_latest_location_for_assignment(live_home_assignment, latest_locations, latest_bus_locations)
         live_fleet = _build_live_fleet_card(
-            active_assignment,
+            live_home_assignment,
             active_location,
-            latest_telemetry.get(active_assignment.id),
-            alerts_by_trip.get(active_assignment.trip_id, []),
+            latest_telemetry.get(live_home_assignment.id),
+            alerts_by_trip.get(live_home_assignment.trip_id, []),
         )
         stops = live_fleet["upcoming_stops"]
     else:

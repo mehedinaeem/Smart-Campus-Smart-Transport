@@ -62,10 +62,21 @@ def student_dashboard_view(request):
     else:
         next_bus["booking_url"] = reverse("seat-booking")
     next_bus["cta_label"] = "Book Seat" if next_bus["is_booking_open"] else "Booking Closed"
+    live_fleet = dashboard_snapshot["live_fleet"]
+    home_live_map_payload = {
+        "bus_label": live_fleet.get("bus_label"),
+        "route_label": live_fleet.get("route_label"),
+        "current_location": live_fleet.get("current_location"),
+        "latitude": live_fleet.get("latitude"),
+        "longitude": live_fleet.get("longitude"),
+        "route_points": live_fleet.get("route_points", []),
+        "stops_payload": live_fleet.get("stops_payload", []),
+    }
 
     context = {
         "page_title": "Home",
         "page_name": "dashboard",
+        "home_live_map_payload": home_live_map_payload,
         **dashboard_snapshot,
         **booking_context,
     }

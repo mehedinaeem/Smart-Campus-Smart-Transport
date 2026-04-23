@@ -1,4 +1,14 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+>
+{% endblock %}
 
 {% block content %}
 <section class="hero-grid">
@@ -14,13 +24,21 @@
 
         <div class="faux-map" data-map-surface>
             {% if live_fleet.has_active_trip %}
-            <div class="route route-main"></div>
-            <div class="route route-alt"></div>
-            {% for map_stop in live_fleet.map_stops %}
-            <div class="stop-marker {% if forloop.counter == 1 %}stop-one{% elif forloop.counter == 2 %}stop-two{% else %}stop-three{% endif %}">{{ map_stop }}</div>
-            {% endfor %}
-            <div class="moving-bus" id="moving-bus-marker">
-                <span>BUS</span>
+            <div
+                class="home-live-map"
+                id="home-live-map"
+                data-home-live-map
+                data-latitude="{{ live_fleet.latitude|default_if_none:'' }}"
+                data-longitude="{{ live_fleet.longitude|default_if_none:'' }}"
+            ></div>
+            <div class="home-map-overlay">
+                {% for map_stop in live_fleet.map_stops %}
+                <div class="stop-marker {% if forloop.counter == 1 %}stop-one{% elif forloop.counter == 2 %}stop-two{% else %}stop-three{% endif %}">{{ map_stop }}</div>
+                {% endfor %}
+                <div class="home-map-badge">
+                    <strong>{{ live_fleet.bus_label }}</strong>
+                    <p>Live GPS</p>
+                </div>
             </div>
             {% else %}
             <div class="map-empty-state">
@@ -122,4 +140,14 @@
     </div>
     {% endfor %}
 </section>
+{{ home_live_map_payload|json_script:"home-live-fleet-data" }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+></script>
+<script src="{% static 'js/home_live_map.js' %}"></script>
 {% endblock %}
