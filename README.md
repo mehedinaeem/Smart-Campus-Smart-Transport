@@ -83,12 +83,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Create an environment file and configure variables such as:
+4. Create an environment file from `.env.example` and configure variables such as:
 
 ```env
 DEBUG=True
 SECRET_KEY=your-secret-key
 DATABASE_URL=sqlite:///db.sqlite3
+ALLOWED_HOSTS=127.0.0.1,localhost
 ```
 
 For PostgreSQL, use a `DATABASE_URL` similar to:
@@ -121,6 +122,68 @@ Then open:
 
 ```text
 http://127.0.0.1:8000/
+```
+
+## Environment Variables
+
+The project now reads deployment-sensitive settings from environment variables.
+
+Required in production:
+
+- `SECRET_KEY`
+- `DEBUG`
+- `DATABASE_URL`
+
+Commonly used:
+
+- `ALLOWED_HOSTS`
+- `CSRF_TRUSTED_ORIGINS`
+- `EMAIL_BACKEND`
+- `EMAIL_HOST`
+- `EMAIL_PORT`
+- `EMAIL_HOST_USER`
+- `EMAIL_HOST_PASSWORD`
+- `EMAIL_USE_TLS`
+- `DEFAULT_FROM_EMAIL`
+- `TRACKING_SHARED_API_KEY`
+
+Render also provides `RENDER_EXTERNAL_HOSTNAME`, which the project automatically uses for `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`.
+
+## Render Deployment
+
+This repository includes:
+
+- `render.yaml` for Render Blueprint deployment
+- `Procfile` for WSGI process declaration
+- WhiteNoise static file serving
+- Gunicorn production serving
+- PostgreSQL-ready `DATABASE_URL` configuration
+
+Recommended Render web service settings:
+
+```text
+Build Command: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput
+Start Command: gunicorn smartbus.wsgi:application
+```
+
+If you use the included `render.yaml`, Render can provision:
+
+- a PostgreSQL database
+- a Python web service
+- generated `SECRET_KEY`
+- `DATABASE_URL` wiring from the managed database
+
+## Local Development After Deployment Changes
+
+Local development still works with SQLite by default if `DATABASE_URL` is not set.
+
+Typical local `.env`:
+
+```env
+DEBUG=True
+SECRET_KEY=dev-secret-key
+DATABASE_URL=sqlite:///db.sqlite3
+ALLOWED_HOSTS=127.0.0.1,localhost
 ```
 
 ## Authentication & Roles
