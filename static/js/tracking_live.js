@@ -32,16 +32,17 @@
 
     L.control.zoom({ position: "bottomright" }).addTo(map);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
         maxZoom: 19,
-        attribution: "&copy; OpenStreetMap contributors",
+        subdomains: "abcd",
+        attribution: "&copy; OpenStreetMap contributors &copy; CARTO",
     }).addTo(map);
 
     const busIcon = L.divIcon({
         className: "",
-        html: '<div class="tracking-bus-marker"><span>BUS</span></div>',
-        iconSize: [42, 42],
-        iconAnchor: [21, 21],
+        html: '<div class="tracking-bus-marker"><span class="tracking-bus-marker__dot"></span></div>',
+        iconSize: [28, 28],
+        iconAnchor: [14, 28],
     });
 
     const stopIcon = L.divIcon({
@@ -58,6 +59,10 @@
     let markers = new Map();
     let selectedPopup = null;
     let mapHasBeenFit = false;
+
+    function hasVisibleVehicles(vehicles) {
+        return vehicles.some((vehicle) => vehicle.latitude !== null && vehicle.longitude !== null);
+    }
 
     function getVehicleById(assignmentId, vehicles) {
         return vehicles.find((item) => item.assignment_id === assignmentId) || null;
@@ -83,7 +88,7 @@
             <div class="tracking-popup">
                 <strong>${vehicle.bus_code}</strong>
                 <p>${vehicle.route_label}</p>
-                <span>${vehicle.live_status} • ${vehicle.speed_kph !== null ? `${vehicle.speed_kph.toFixed(0)} km/h` : "Speed pending"}</span>
+                <span>${vehicle.live_status} | ${vehicle.speed_kph !== null ? `${vehicle.speed_kph.toFixed(0)} km/h` : "Speed pending"}</span>
             </div>
         `;
         marker.bindPopup(popupHtml, { closeButton: false, offset: [0, -18] });
@@ -278,7 +283,7 @@
 
     function render(nextState) {
         state = nextState;
-        overlay.hidden = state.has_assignments;
+        overlay.hidden = hasVisibleVehicles(state.vehicles);
         syncMarkers(state.vehicles);
         renderVehicleList(state.vehicles);
 
@@ -296,6 +301,7 @@
         updateDetails(selectedVehicle);
         updateRoute(selectedVehicle);
         updateMapFocus(state.vehicles, selectedVehicle);
+        map.invalidateSize();
     }
 
     async function refresh() {

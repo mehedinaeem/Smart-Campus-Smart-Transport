@@ -210,6 +210,14 @@ def _build_latest_location_lookup(assignments):
     return latest_by_assignment
 
 
+def _build_latest_bus_location_lookup():
+    latest_by_bus = {}
+    locations = BusLocation.objects.filter(bus__is_active=True).select_related("bus", "trip", "assignment")
+    for location in locations.order_by("bus_id", "-recorded_at", "-id"):
+        latest_by_bus.setdefault(location.bus_id, location)
+    return latest_by_bus
+
+
 def _build_booking_count_lookup(assignments):
     assignment_ids = [assignment.id for assignment in assignments]
     if not assignment_ids:
@@ -306,6 +314,43 @@ def _serialize_assignment(assignment, latest_location, booking_count, now):
     }
 
 
+def _serialize_unassigned_bus_location(location, now):
+    location_age_seconds = max(0, int((now - location.recorded_at).total_seconds()))
+    live_status = _get_live_status(None, location_age_seconds, True)
+    bus_label = location.bus.label or location.bus.code
+    return {
+        "assignment_id": -location.bus_id,
+        "trip_id": location.trip_id,
+        "bus_id": location.bus_id,
+        "bus_code": location.bus.code,
+        "bus_label": bus_label,
+        "route_label": "Live Bus Location",
+        "route_section": "No active trip assignment",
+        "trip_status": "unassigned",
+        "trip_status_label": "No active trip",
+        "live_status": live_status,
+        "live_status_tone": _get_live_status_tone(live_status),
+        "driver_name": "Unassigned",
+        "start_time": "--",
+        "end_time": "--",
+        "service_date": timezone.localdate(now).isoformat(),
+        "booking_count": 0,
+        "seat_capacity": location.bus.seat_capacity,
+        "occupancy_label": "--",
+        "speed_kph": float(location.speed_kph),
+        "heading": float(location.heading) if location.heading is not None else None,
+        "ignition_on": location.ignition_on,
+        "last_reported_at": timezone.localtime(location.recorded_at).isoformat(),
+        "last_reported_label": timezone.localtime(location.recorded_at).strftime("%I:%M:%S %p"),
+        "location_age_seconds": location_age_seconds,
+        "latitude": float(location.latitude),
+        "longitude": float(location.longitude),
+        "eta_label": "GPS live",
+        "stops": [],
+        "route_points": [],
+    }
+
+
 def get_tracking_dashboard_payload(*, selected_assignment_id=None, now=None):
     now = now or timezone.localtime()
     assignments = [
@@ -330,6 +375,21 @@ def get_tracking_dashboard_payload(*, selected_assignment_id=None, now=None):
         )
         for assignment in assignments
     ]
+
+    assigned_bus_ids = {vehicle["bus_id"] for vehicle in vehicles}
+    latest_bus_locations = _build_latest_bus_location_lookup()
+    for bus_id, location in latest_bus_locations.items():
+        if bus_id in assigned_bus_ids:
+            continue
+        vehicles.append(_serialize_unassigned_bus_location(location, now))
+
+    vehicles.sort(
+        key=lambda item: (
+            item["live_status"] not in {"Active", "Upcoming"},
+            item["route_label"],
+            item["bus_code"],
+        )
+    )
 
     selected_vehicle = None
     if vehicles:

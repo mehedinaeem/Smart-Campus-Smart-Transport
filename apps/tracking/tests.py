@@ -71,3 +71,25 @@ class TrackingIntegrationTests(TestCase):
         payload = response.json()
         self.assertEqual(len(payload["vehicles"]), 1)
         self.assertEqual(payload["vehicles"][0]["assignment_id"], self.assignment.id)
+
+    def test_live_feed_includes_bus_with_latest_location_without_assignment(self):
+        now = timezone.localtime()
+        unassigned_bus = Bus.objects.create(code="BUS-303", label="Bus 303", seat_capacity=40, is_active=True)
+        BusLocation.objects.create(
+            bus=unassigned_bus,
+            latitude="23.750000",
+            longitude="90.390000",
+            speed_kph="18.50",
+            recorded_at=now,
+            raw_payload={"bus_identifier": "BUS-303"},
+        )
+
+        response = self.client.get(reverse("live-tracking-feed"))
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        vehicle = next(item for item in payload["vehicles"] if item["bus_code"] == "BUS-303")
+        self.assertEqual(vehicle["assignment_id"], -unassigned_bus.id)
+        self.assertEqual(vehicle["route_label"], "Live Bus Location")
+        self.assertEqual(vehicle["latitude"], 23.75)
+        self.assertEqual(vehicle["longitude"], 90.39)

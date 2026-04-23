@@ -6,34 +6,45 @@
         <div class="section-header">
             <div>
                 <p class="eyebrow">Live Fleet View</p>
-                <h3>Campus movement in real time</h3>
+                <h3>{{ live_fleet.title }}</h3>
+                <p>{{ live_fleet.subtitle }}</p>
             </div>
-            <span class="status-chip success">Tracking Active</span>
+            <span class="status-chip {{ live_fleet.status_tone }}">{{ live_fleet.status_label }}</span>
         </div>
 
         <div class="faux-map" data-map-surface>
+            {% if live_fleet.has_active_trip %}
             <div class="route route-main"></div>
             <div class="route route-alt"></div>
-            <div class="stop-marker stop-one">Innovation Hub</div>
-            <div class="stop-marker stop-two">Central Library</div>
-            <div class="stop-marker stop-three">Dormitory West</div>
+            {% for map_stop in live_fleet.map_stops %}
+            <div class="stop-marker {% if forloop.counter == 1 %}stop-one{% elif forloop.counter == 2 %}stop-two{% else %}stop-three{% endif %}">{{ map_stop }}</div>
+            {% endfor %}
             <div class="moving-bus" id="moving-bus-marker">
                 <span>BUS</span>
             </div>
+            {% else %}
+            <div class="map-empty-state">
+                <strong>{{ live_fleet.empty_message }}</strong>
+                <p>As soon as a trip becomes active, the fleet panel will switch from standby to live movement.</p>
+            </div>
+            {% endif %}
         </div>
 
         <div class="map-stats">
             <div class="stat-tile">
                 <span>Current Location</span>
-                <strong>{{ live_status.location }}</strong>
+                <strong>{{ live_fleet.current_location }}</strong>
+                <p>{{ live_fleet.current_location_detail }}</p>
             </div>
             <div class="stat-tile">
                 <span>ETA to Next Stop</span>
-                <strong>{{ live_status.eta }}</strong>
+                <strong>{{ live_fleet.eta_label }}</strong>
+                <p>{% if live_fleet.next_stop %}{{ live_fleet.next_stop.name }}{% else %}Waiting for mapped route data{% endif %}</p>
             </div>
             <div class="stat-tile">
                 <span>Traffic Status</span>
-                <strong class="traffic-ok">{{ live_status.traffic }}</strong>
+                <strong class="{{ live_fleet.traffic_tone }}">{{ live_fleet.traffic_label }}</strong>
+                <p>{% if live_fleet.route_label %}{{ live_fleet.route_label }}{% else %}Traffic data unavailable{% endif %}</p>
             </div>
         </div>
     </div>
@@ -41,9 +52,20 @@
     <div class="stack-column">
         <div class="glass-panel spotlight-card">
             <p class="eyebrow">Next Bus Arrival</p>
-            <h3>{{ live_status.next_arrival }}</h3>
-            <p>{{ live_status.bus }} is approaching Central Library with {{ live_status.occupancy }} occupied.</p>
-            <a class="primary-btn wide-btn" href="{% url 'seat-booking' %}">Book Seat</a>
+            <h3>{{ next_bus.headline }}</h3>
+            <p>{{ next_bus.detail }}</p>
+            {% if next_bus.exists %}
+            <div class="trip-meta">
+                <div><span>Route</span><strong>{{ next_bus.route_name }}</strong></div>
+                <div><span>Status</span><strong>{{ next_bus.trip_status_label }}</strong></div>
+                <div><span>Seats</span><strong>{{ next_bus.occupancy_label }}</strong></div>
+            </div>
+            {% endif %}
+            {% if next_bus.is_booking_open %}
+            <a class="primary-btn wide-btn" href="{{ next_bus.booking_url }}">Book Seat</a>
+            {% else %}
+            <span class="primary-btn wide-btn is-disabled" aria-disabled="true">{{ next_bus.cta_label }}</span>
+            {% endif %}
         </div>
 
         <div class="glass-panel compact-list">
@@ -57,9 +79,19 @@
             <div class="list-row">
                 <div>
                     <strong>{{ stop.name }}</strong>
-                    <p>Estimated approach</p>
+                    <p>{{ stop.state_label }}</p>
                 </div>
-                <span>{{ stop.eta }}</span>
+                <div class="list-row__meta">
+                    <span class="table-badge {{ stop.state_tone }}">{{ stop.state_label }}</span>
+                    <span>{{ stop.eta }}</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="list-row">
+                <div>
+                    <strong>No mapped stops available yet.</strong>
+                    <p>Add `RouteStop` records to show the ordered stop timeline here.</p>
+                </div>
             </div>
             {% endfor %}
         </div>
@@ -71,7 +103,7 @@
     <div class="glass-panel feature-card">
         <p class="eyebrow">Active Booking</p>
         {% if active_booking %}
-        <h3>{{ active_booking.assignment.bus.code }} • {{ active_booking.seat_number }}</h3>
+        <h3>{{ active_booking.assignment.bus.code }} &bull; {{ active_booking.seat_number }}</h3>
         <p>{{ active_booking.route_label }} on {{ active_booking.assignment.trip.service_date }} at {{ active_booking.assignment.trip.start_time|time:"g:i A" }}.</p>
         <a class="primary-btn wide-btn" href="{% url 'my-booking' %}">View Booking</a>
         {% else %}
@@ -81,20 +113,13 @@
         {% endif %}
     </div>
     {% endif %}
+
+    {% for card in info_cards %}
     <div class="glass-panel feature-card">
-        <p class="eyebrow">Seat Confidence</p>
-        <h3>One-tap booking</h3>
-        <p>Reserve available seats instantly and receive a scan token without extra forms.</p>
+        <p class="eyebrow">{{ card.eyebrow }}</p>
+        <h3>{{ card.title }}</h3>
+        <p>{{ card.detail }}</p>
     </div>
-    <div class="glass-panel feature-card">
-        <p class="eyebrow">Route Clarity</p>
-        <h3>Smart stop visibility</h3>
-        <p>Students can understand where the bus is, where it is heading, and how traffic affects timing.</p>
-    </div>
-    <div class="glass-panel feature-card">
-        <p class="eyebrow">Campus Ready</p>
-        <h3>Built for rush hours</h3>
-        <p>High contrast, clear hierarchy, and responsive cards keep the interface calm under pressure.</p>
-    </div>
+    {% endfor %}
 </section>
 {% endblock %}

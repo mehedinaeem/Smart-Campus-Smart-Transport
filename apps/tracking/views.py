@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -6,6 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from .services import TrackingError, get_tracking_dashboard_payload, ingest_device_telemetry
+
+logger = logging.getLogger(__name__)
 
 
 def live_tracking_view(request):
@@ -39,10 +42,15 @@ def live_tracking_feed_view(request):
 @csrf_exempt
 @require_POST
 def telemetry_ingest_view(request):
+    raw_body = request.body.decode("utf-8", errors="replace")
+    logger.warning("Telemetry payload received: %s", raw_body)
+
     try:
-        payload = json.loads(request.body.decode("utf-8"))
+        payload = json.loads(raw_body)
     except (json.JSONDecodeError, UnicodeDecodeError):
         return JsonResponse({"ok": False, "error": "Request body must be valid JSON."}, status=400)
+
+    logger.warning("Telemetry payload parsed: %s", payload)
 
     try:
         result = ingest_device_telemetry(payload)

@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.generic import FormView
 
 from apps.booking.services import get_dashboard_booking_context
@@ -10,6 +11,7 @@ from apps.routing.services import get_current_driver_assignment
 from .auth_utils import get_post_login_url, get_safe_redirect
 from .decorators import role_required
 from .forms import LoginForm, StudentSignupForm
+from .services import get_student_dashboard_snapshot
 
 
 class RoleAwareLoginView(LoginView):
@@ -49,27 +51,22 @@ class StudentSignupView(FormView):
 
 
 def student_dashboard_view(request):
+    dashboard_snapshot = get_student_dashboard_snapshot()
     booking_context = get_dashboard_booking_context(request.user) if request.user.is_authenticated else {
         "active_booking": None,
         "booking_history": [],
     }
+    next_bus = dashboard_snapshot["next_bus"]
+    if next_bus["assignment_id"]:
+        next_bus["booking_url"] = f"{reverse('seat-booking')}?assignment={next_bus['assignment_id']}"
+    else:
+        next_bus["booking_url"] = reverse("seat-booking")
+    next_bus["cta_label"] = "Book Seat" if next_bus["is_booking_open"] else "Booking Closed"
+
     context = {
         "page_title": "Home",
         "page_name": "dashboard",
-        "live_status": {
-            "bus": "Campus Loop A2",
-            "location": "Near Engineering Gate",
-            "eta": "4 min",
-            "traffic": "Normal",
-            "next_arrival": "08:12 AM",
-            "occupancy": "18 / 32 seats",
-        },
-        "stops": [
-            {"name": "Innovation Hub", "eta": "2 min"},
-            {"name": "Central Library", "eta": "4 min"},
-            {"name": "Dormitory West", "eta": "8 min"},
-            {"name": "Medical Center", "eta": "12 min"},
-        ],
+        **dashboard_snapshot,
         **booking_context,
     }
     return render(request, "core/student_dashboard.html", context)

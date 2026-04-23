@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+import socket
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,11 +27,39 @@ SECRET_KEY = 'django-insecure-f&t19=n#jn=to#-%@dsayegbfv*z3bu1#lfgm&&!qrzrmn-*2s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
+
+def _development_hosts():
+    hosts = {"127.0.0.1", "localhost", "0.0.0.0", "::1"}
+
+    for candidate in (socket.gethostname(), socket.getfqdn()):
+        if candidate:
+            hosts.add(candidate)
+
+    try:
+        hosts.update(socket.gethostbyname_ex(socket.gethostname())[2])
+    except OSError:
+        pass
+
+    try:
+        for family, _, _, _, sockaddr in socket.getaddrinfo(socket.gethostname(), None):
+            if family in (socket.AF_INET, socket.AF_INET6) and sockaddr:
+                hosts.add(sockaddr[0])
+    except OSError:
+        pass
+
+    return hosts
+
+
+ALLOWED_HOSTS = {
     host.strip()
     for host in os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
     if host.strip()
-]
+}
+
+if DEBUG:
+    ALLOWED_HOSTS.update(_development_hosts())
+
+ALLOWED_HOSTS = sorted(ALLOWED_HOSTS)
 
 
 # Application definition
