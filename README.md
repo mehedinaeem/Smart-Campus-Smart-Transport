@@ -146,6 +146,9 @@ Commonly used:
 - `EMAIL_USE_TLS`
 - `DEFAULT_FROM_EMAIL`
 - `TRACKING_SHARED_API_KEY`
+- `DJANGO_SUPERUSER_USERNAME`
+- `DJANGO_SUPERUSER_EMAIL`
+- `DJANGO_SUPERUSER_PASSWORD`
 
 Render also provides `RENDER_EXTERNAL_HOSTNAME`, which the project automatically uses for `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS`.
 
@@ -172,6 +175,20 @@ If you use the included `render.yaml`, Render can provision:
 - a Python web service
 - generated `SECRET_KEY`
 - `DATABASE_URL` wiring from the managed database
+
+The project can also bootstrap the first superuser automatically on app startup if these environment variables are set:
+
+```env
+DJANGO_SUPERUSER_USERNAME=admin
+DJANGO_SUPERUSER_EMAIL=admin@example.com
+DJANGO_SUPERUSER_PASSWORD=choose-a-strong-password
+```
+
+Behavior:
+
+- if no superuser exists, one is created
+- if a superuser already exists, nothing happens
+- if any of the variables are missing, bootstrap is skipped safely
 
 ## Local Development After Deployment Changes
 

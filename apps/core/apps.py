@@ -7,3 +7,6 @@ class CoreConfig(AppConfig):
 
     def ready(self):
         from . import signals  # noqa: F401
+        from .bootstrap import schedule_default_superuser_creation
+
+        schedule_default_superuser_creation()
