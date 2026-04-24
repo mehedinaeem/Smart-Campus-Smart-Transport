@@ -6,6 +6,8 @@ Smart Campus, Smart Bus is a Django-based smart transportation system designed f
 
 This project provides a modern smart transport platform for campus bus services. It combines booking, tracking, scheduling, role-based access, and admin monitoring tools with a clean dark-themed dashboard experience.
 
+Slide: https://docs.google.com/presentation/d/1GED4orBdurM0tKLJaUc-a6ort0a4T2OlR3odK8v1Pok/edit?slide=id.g3e60c69d4b1_2_83#slide=id.g3e60c69d4b1_2_83
+
 ## Features
 
 - Live bus tracking dashboard

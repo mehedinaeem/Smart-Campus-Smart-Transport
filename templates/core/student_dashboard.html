@@ -1,153 +1,478 @@
-{% extends "base.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block extra_head %}
-<link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
->
-{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Smart Campus Smart Transport</title>
+    <meta name="description" content="Smart Campus Smart Transport — real-time bus tracking, seat booking, and schedule management for your campus.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    >
+</head>
 
-{% block content %}
-<section class="hero-grid">
-    <div class="map-card glass-panel">
-        <div class="section-header">
-            <div>
-                <p class="eyebrow">Live Fleet View</p>
-                <h3>{{ live_fleet.title }}</h3>
-                <p>{{ live_fleet.subtitle }}</p>
-            </div>
-            <span class="status-chip {{ live_fleet.status_tone }}">{{ live_fleet.status_label }}</span>
-        </div>
+<body class="landing-body">
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- TOP NAVBAR                                                        -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <header class="landing-navbar" id="landing-navbar">
+        <div class="landing-navbar__inner">
+            <a class="landing-brand" href="{% url 'student-dashboard' %}" aria-label="Home">
+                <span class="landing-brand__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                        <rect x="3" y="6" width="18" height="11" rx="3"/>
+                        <line x1="3" y1="17" x2="21" y2="17"/>
+                        <circle cx="7.5" cy="17" r="1.5"/>
+                        <circle cx="16.5" cy="17" r="1.5"/>
+                        <line x1="7" y1="6" x2="7" y2="3"/>
+                        <line x1="17" y1="6" x2="17" y2="3"/>
+                        <line x1="3" y1="10.5" x2="21" y2="10.5"/>
+                    </svg>
+                </span>
+                <span class="landing-brand__text">
+                    <strong>Smart Campus</strong>
+                    <small>Smart Transport</small>
+                </span>
+            </a>
 
-        <div class="faux-map" data-map-surface>
-            {% if live_fleet.has_active_trip %}
-            <div
-                class="home-live-map"
-                id="home-live-map"
-                data-home-live-map
-                data-latitude="{{ live_fleet.latitude|default_if_none:'' }}"
-                data-longitude="{{ live_fleet.longitude|default_if_none:'' }}"
-            ></div>
-            <div class="home-map-overlay">
-                {% for map_stop in live_fleet.map_stops %}
-                <div class="stop-marker {% if forloop.counter == 1 %}stop-one{% elif forloop.counter == 2 %}stop-two{% else %}stop-three{% endif %}">{{ map_stop }}</div>
-                {% endfor %}
-                <div class="home-map-badge">
-                    <strong>{{ live_fleet.bus_label }}</strong>
-                    <p>Live GPS</p>
+            <nav class="landing-nav" id="landing-nav" aria-label="Main navigation">
+                <a class="landing-nav__link active" href="{% url 'student-dashboard' %}">
+                    <span class="landing-nav__icon" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+                    </span>
+                    Home
+                </a>
+                <a class="landing-nav__link" href="{% url 'live-tracking' %}">
+                    <span class="landing-nav__icon" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                    </span>
+                    Live map
+                </a>
+                <a class="landing-nav__link" href="{% url 'bus-schedule' %}">
+                    <span class="landing-nav__icon" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+                    </span>
+                    Schedule
+                </a>
+                <a class="landing-nav__link" href="{% url 'seat-booking' %}">
+                    <span class="landing-nav__icon" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/><path d="M2 8a1 1 0 011-1h1v6H3a1 1 0 01-1-1V8zm14-1a1 1 0 011 1v4a1 1 0 01-1 1h-1V7h1z"/></svg>
+                    </span>
+                    Booking
+                </a>
+
+                {% if is_admin_user %}
+                <a class="landing-nav__link" href="{% url 'admin-dashboard' %}">
+                    <span class="landing-nav__icon" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                    </span>
+                    Dashboard
+                </a>
+                {% endif %}
+
+                <!-- Mobile-only auth actions (visible inside the mobile drawer) -->
+                <div class="landing-nav__mobile-auth">
+                    {% if request.user.is_authenticated %}
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button class="landing-btn landing-btn--outline landing-btn--full" type="submit">Logout</button>
+                    </form>
+                    {% else %}
+                    <a class="landing-btn landing-btn--outline landing-btn--full" href="{% url 'login' %}">Login</a>
+                    <a class="landing-btn landing-btn--accent landing-btn--full" href="{% url 'signup' %}">Sign up</a>
+                    {% endif %}
                 </div>
-            </div>
-            {% else %}
-            <div class="map-empty-state">
-                <strong>{{ live_fleet.empty_message }}</strong>
-                <p>As soon as a trip becomes active, the fleet panel will switch from standby to live movement.</p>
-            </div>
-            {% endif %}
-        </div>
+            </nav>
 
-        <div class="map-stats">
-            <div class="stat-tile">
-                <span>Current Location</span>
-                <strong>{{ live_fleet.current_location }}</strong>
-                <p>{{ live_fleet.current_location_detail }}</p>
+            <div class="landing-navbar__actions">
+                {% if request.user.is_authenticated %}
+                <div class="landing-auth-shell">
+                    <button class="landing-avatar-btn" type="button" id="landing-auth-trigger" aria-label="User menu" aria-expanded="false">
+                        <span class="landing-avatar">
+                            {% if request.user.first_name %}{{ request.user.first_name|first|upper }}{% else %}{{ request.user.username|first|upper }}{% endif %}
+                        </span>
+                    </button>
+                    <div class="landing-auth-menu" id="landing-auth-menu" hidden>
+                        <div class="landing-auth-profile">
+                            <div class="landing-avatar landing-avatar--lg">
+                                {% if request.user.first_name %}{{ request.user.first_name|first|upper }}{% else %}{{ request.user.username|first|upper }}{% endif %}
+                            </div>
+                            <div>
+                                <strong>{% if request.user.get_full_name %}{{ request.user.get_full_name }}{% else %}{{ request.user.username }}{% endif %}</strong>
+                                <p>{{ user_role|title }} access</p>
+                            </div>
+                        </div>
+                        {% if is_student %}
+                        <a class="landing-auth-link" href="{% url 'my-booking' %}">My Booking</a>
+                        {% elif is_driver %}
+                        <a class="landing-auth-link" href="{% url 'driver-dashboard' %}">My Assigned Route</a>
+                        {% elif is_admin_user %}
+                        <a class="landing-auth-link" href="{% url 'admin-dashboard' %}">Admin Workspace</a>
+                        <a class="landing-auth-link" href="{% url 'trip-assignments' %}">Trip Assignments</a>
+                        <a class="landing-auth-link" href="{% url 'manage-roles' %}">Manage Roles</a>
+                        <a class="landing-auth-link" href="{% url 'alerts-monitoring' %}">Alerts & Monitoring</a>
+                        <a class="landing-auth-link" href="{% url 'analytics' %}">Analytics</a>
+                        {% endif %}
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button class="landing-auth-logout" type="submit">Logout</button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <a class="landing-btn landing-btn--outline" href="{% url 'login' %}" id="login-btn">Login</a>
+                <a class="landing-btn landing-btn--accent" href="{% url 'signup' %}" id="signup-btn">Sign up</a>
+                {% endif %}
             </div>
-            <div class="stat-tile">
-                <span>ETA to Next Stop</span>
-                <strong>{{ live_fleet.eta_label }}</strong>
-                <p>{% if live_fleet.next_stop %}{{ live_fleet.next_stop.name }}{% else %}Waiting for mapped route data{% endif %}</p>
-            </div>
-            <div class="stat-tile">
-                <span>Traffic Status</span>
-                <strong class="{{ live_fleet.traffic_tone }}">{{ live_fleet.traffic_label }}</strong>
-                <p>{% if live_fleet.route_label %}{{ live_fleet.route_label }}{% else %}Traffic data unavailable{% endif %}</p>
-            </div>
-        </div>
-    </div>
 
-    <div class="stack-column">
-        <div class="glass-panel spotlight-card">
-            <p class="eyebrow">Next Bus Arrival</p>
-            <h3>{{ next_bus.headline }}</h3>
-            <p>{{ next_bus.detail }}</p>
-            {% if next_bus.exists %}
-            <div class="trip-meta">
-                <div><span>Route</span><strong>{{ next_bus.route_name }}</strong></div>
-                <div><span>Status</span><strong>{{ next_bus.trip_status_label }}</strong></div>
-                <div><span>Seats</span><strong>{{ next_bus.occupancy_label }}</strong></div>
-            </div>
-            {% endif %}
-            {% if next_bus.is_booking_open %}
-            <a class="primary-btn wide-btn" href="{{ next_bus.booking_url }}">Book Seat</a>
-            {% else %}
-            <span class="primary-btn wide-btn is-disabled" aria-disabled="true">{{ next_bus.cta_label }}</span>
-            {% endif %}
+            <button class="landing-hamburger" type="button" id="landing-hamburger" aria-label="Toggle menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
+    </header>
 
-        <div class="glass-panel compact-list">
-            <div class="section-header">
-                <div>
-                    <p class="eyebrow">Upcoming Stops</p>
-                    <h3>Student-ready timeline</h3>
-                </div>
-            </div>
-            {% for stop in stops %}
-            <div class="list-row">
-                <div>
-                    <strong>{{ stop.name }}</strong>
-                    <p>{{ stop.state_label }}</p>
-                </div>
-                <div class="list-row__meta">
-                    <span class="table-badge {{ stop.state_tone }}">{{ stop.state_label }}</span>
-                    <span>{{ stop.eta }}</span>
-                </div>
-            </div>
-            {% empty %}
-            <div class="list-row">
-                <div>
-                    <strong>No mapped stops available yet.</strong>
-                    <p>Add `RouteStop` records to show the ordered stop timeline here.</p>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<section class="dashboard-strip">
-    {% if request.user.is_authenticated and is_student %}
-    <div class="glass-panel feature-card">
-        <p class="eyebrow">Active Booking</p>
-        {% if active_booking %}
-        <h3>{{ active_booking.assignment.bus.code }} &bull; {{ active_booking.seat_number }}</h3>
-        <p>{{ active_booking.route_label }} on {{ active_booking.assignment.trip.service_date }} at {{ active_booking.assignment.trip.start_time|time:"g:i A" }}.</p>
-        <a class="primary-btn wide-btn" href="{% url 'my-booking' %}">View Booking</a>
-        {% else %}
-        <h3>No active seat</h3>
-        <p>Book one seat for an open trip window and it will stay here until the trip completes.</p>
-        <a class="primary-btn wide-btn" href="{% url 'seat-booking' %}">Book Seat</a>
-        {% endif %}
-    </div>
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- MESSAGES                                                          -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    {% if messages %}
+    <section class="landing-messages">
+        {% for message in messages %}
+        <div class="message-banner message-{{ message.tags|default:'info' }}">{{ message }}</div>
+        {% endfor %}
+    </section>
     {% endif %}
 
-    {% for card in info_cards %}
-    <div class="glass-panel feature-card">
-        <p class="eyebrow">{{ card.eyebrow }}</p>
-        <h3>{{ card.title }}</h3>
-        <p>{{ card.detail }}</p>
-    </div>
-    {% endfor %}
-</section>
-{{ home_live_map_payload|json_script:"home-live-fleet-data" }}
-{% endblock %}
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- HERO SECTION                                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <main class="landing-main">
+        <section class="landing-hero" id="hero-section">
+            <div class="landing-hero__content">
+                <div class="landing-live-badge" aria-live="polite">
+                    <span class="landing-pulse"></span>
+                    {% if live_fleet.has_active_trip %}
+                        {{ live_fleet.bus_label }} tracking live
+                    {% else %}
+                        System online
+                    {% endif %}
+                </div>
 
-{% block extra_scripts %}
-<script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-></script>
-<script src="{% static 'js/home_live_map.js' %}"></script>
-{% endblock %}
+                <h1 class="landing-hero__title">
+                    Your campus bus,<br>
+                    tracked <em>in real time</em>
+                </h1>
+
+                <p class="landing-hero__sub">
+                    See where every campus bus is, book your seat in seconds, and never miss a ride again.
+                    Real-time tracking, smart schedules, and instant seat booking — all in one place.
+                </p>
+
+                <div class="landing-hero__actions">
+                    <a class="landing-btn landing-btn--primary landing-btn--lg" href="{% url 'live-tracking' %}" id="cta-live-map">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                        View live map
+                    </a>
+                    <a class="landing-btn landing-btn--ghost landing-btn--lg" href="{% url 'seat-booking' %}" id="cta-book-seat">
+                        Book a seat
+                    </a>
+                </div>
+            </div>
+
+            <!-- Next Arrivals Card -->
+            <div class="landing-arrivals" id="next-arrivals-card">
+                <div class="landing-arrivals__head">
+                    <h2 class="landing-arrivals__title">Next arrivals</h2>
+                    <span class="landing-arrivals__live">
+                        <span class="landing-pulse landing-pulse--sm"></span>
+                        Live
+                    </span>
+                </div>
+
+                {% if stops %}
+                    {% for stop in stops|slice:":3" %}
+                    <div class="landing-arrival-row">
+                        <span class="landing-arrival-badge">{{ forloop.counter }}</span>
+                        <div class="landing-arrival-info">
+                            <strong>{{ stop.name }}</strong>
+                            <span>{{ stop.state_label }}{% if next_bus.route_name %} · {{ next_bus.route_name }}{% endif %}</span>
+                        </div>
+                        <span class="landing-arrival-eta {% if stop.state_tone == 'success' %}landing-arrival-eta--soon{% endif %}">{{ stop.eta }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- Placeholder rows when no live data -->
+                    <div class="landing-arrival-row">
+                        <span class="landing-arrival-badge">1</span>
+                        <div class="landing-arrival-info">
+                            <strong>Hall Gate → Campus</strong>
+                            <span>Green line · 8 seats left</span>
+                        </div>
+                        <span class="landing-arrival-eta landing-arrival-eta--soon">3 min</span>
+                    </div>
+                    <div class="landing-arrival-row">
+                        <span class="landing-arrival-badge">2</span>
+                        <div class="landing-arrival-info">
+                            <strong>Campus → City</strong>
+                            <span>Express · 14 seats left</span>
+                        </div>
+                        <span class="landing-arrival-eta">12 min</span>
+                    </div>
+                    <div class="landing-arrival-row">
+                        <span class="landing-arrival-badge">3</span>
+                        <div class="landing-arrival-info">
+                            <strong>Hospital Gate → Campus</strong>
+                            <span>Staff line · 5 seats left</span>
+                        </div>
+                        <span class="landing-arrival-eta">18 min</span>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- STATS STRIP                                                    -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <section class="landing-stats" id="stats-section">
+            {% for card in info_cards %}
+            <div class="landing-stat-card">
+                <span class="landing-stat__value">{{ card.title }}</span>
+                <span class="landing-stat__label">{{ card.eyebrow }}</span>
+            </div>
+            {% empty %}
+            <div class="landing-stat-card">
+                <span class="landing-stat__value">24</span>
+                <span class="landing-stat__label">Buses online</span>
+            </div>
+            <div class="landing-stat-card">
+                <span class="landing-stat__value">4</span>
+                <span class="landing-stat__label">Routes active</span>
+            </div>
+            <div class="landing-stat-card">
+                <span class="landing-stat__value">98%</span>
+                <span class="landing-stat__label">On-time today</span>
+            </div>
+            {% endfor %}
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- ACTIVE BOOKING (shown for logged-in students only)            -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        {% if request.user.is_authenticated and is_student %}
+        <section class="landing-booking-strip" id="active-booking-section">
+            <div class="landing-booking-card">
+                <p class="landing-section-eyebrow">Active Booking</p>
+                {% if active_booking %}
+                <h3>{{ active_booking.assignment.bus.code }} &bull; {{ active_booking.seat_number }}</h3>
+                <p>{{ active_booking.route_label }} on {{ active_booking.assignment.trip.service_date }} at {{ active_booking.assignment.trip.start_time|time:"g:i A" }}.</p>
+                <a class="landing-btn landing-btn--primary" href="{% url 'my-booking' %}">View Booking</a>
+                {% else %}
+                <h3>No active seat</h3>
+                <p>Book one seat for an open trip window and it will stay here until the trip completes.</p>
+                <a class="landing-btn landing-btn--primary" href="{% url 'seat-booking' %}">Book Seat</a>
+                {% endif %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- WHAT YOU CAN DO                                                -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <section class="landing-features" id="features-section">
+            <p class="landing-section-eyebrow">What you can do</p>
+
+            <div class="landing-features__grid">
+                <a class="landing-feature-card" href="{% url 'live-tracking' %}" id="feature-live-tracking">
+                    <span class="landing-feature-icon landing-feature-icon--teal" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
+                    </span>
+                    <h3>Live tracking</h3>
+                    <p>See every bus on the campus map, updated every 5 seconds.</p>
+                </a>
+
+                <a class="landing-feature-card" href="{% url 'seat-booking' %}" id="feature-seat-booking">
+                    <span class="landing-feature-icon landing-feature-icon--blue" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/><path d="M2 8a1 1 0 011-1h1v6H3a1 1 0 01-1-1V8zm14-1a1 1 0 011 1v4a1 1 0 01-1 1h-1V7h1z"/></svg>
+                    </span>
+                    <h3>Seat booking</h3>
+                    <p>Reserve your seat ahead of time and get a QR boarding token.</p>
+                </a>
+
+                <a class="landing-feature-card" href="{% url 'bus-schedule' %}" id="feature-bus-schedule">
+                    <span class="landing-feature-icon landing-feature-icon--purple" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+                    </span>
+                    <h3>Bus schedule</h3>
+                    <p>Full timetable for teachers, staff, students and express service.</p>
+                </a>
+
+                {% if is_admin_user %}
+                <a class="landing-feature-card" href="{% url 'trip-assignments' %}" id="feature-trip-assignments">
+                    <span class="landing-feature-icon landing-feature-icon--orange" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+                    </span>
+                    <h3>Trip assignments</h3>
+                    <p>Manage driver assignments, schedules, and trip logistics.</p>
+                </a>
+
+                <a class="landing-feature-card" href="{% url 'alerts-monitoring' %}" id="feature-alerts">
+                    <span class="landing-feature-icon landing-feature-icon--red" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                    </span>
+                    <h3>Alerts & monitoring</h3>
+                    <p>Real-time alerts on fuel, traffic, and system events.</p>
+                </a>
+
+                <a class="landing-feature-card" href="{% url 'analytics' %}" id="feature-analytics">
+                    <span class="landing-feature-icon landing-feature-icon--cyan" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+                    </span>
+                    <h3>Analytics</h3>
+                    <p>Insights on ridership, fuel usage, and route performance.</p>
+                </a>
+
+                <a class="landing-feature-card" href="{% url 'manage-roles' %}" id="feature-roles">
+                    <span class="landing-feature-icon landing-feature-icon--green" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+                    </span>
+                    <h3>Manage roles</h3>
+                    <p>Control access for drivers, students and admins.</p>
+                </a>
+                {% endif %}
+
+                {% if is_student %}
+                <a class="landing-feature-card" href="{% url 'my-booking' %}" id="feature-my-booking">
+                    <span class="landing-feature-icon landing-feature-icon--orange" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                    </span>
+                    <h3>My bookings</h3>
+                    <p>View and manage your current and past seat reservations.</p>
+                </a>
+                {% endif %}
+
+                {% if is_driver %}
+                <a class="landing-feature-card" href="{% url 'driver-dashboard' %}" id="feature-driver-dashboard">
+                    <span class="landing-feature-icon landing-feature-icon--orange" aria-hidden="true">
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+                    </span>
+                    <h3>My assigned route</h3>
+                    <p>Check your driving assignment, stops, and trip status.</p>
+                </a>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- FOOTER                                                         -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <footer class="landing-footer" id="landing-footer">
+            <div class="landing-footer__brand">
+                <span class="landing-brand__icon landing-brand__icon--sm" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                        <rect x="3" y="6" width="18" height="11" rx="3"/>
+                        <line x1="3" y1="17" x2="21" y2="17"/>
+                        <circle cx="7.5" cy="17" r="1.5"/>
+                        <circle cx="16.5" cy="17" r="1.5"/>
+                        <line x1="7" y1="6" x2="7" y2="3"/>
+                        <line x1="17" y1="6" x2="17" y2="3"/>
+                        <line x1="3" y1="10.5" x2="21" y2="10.5"/>
+                    </svg>
+                </span>
+                <span>Smart Campus Smart Transport</span>
+            </div>
+            <p>&copy; 2026 Smart Campus Transit. Built for smarter campus commutes.</p>
+        </footer>
+    </main>
+
+    {{ home_live_map_payload|json_script:"home-live-fleet-data" }}
+
+    <script>
+    (function() {
+        // Hamburger toggle
+        const hamburger = document.getElementById('landing-hamburger');
+        const nav = document.getElementById('landing-nav');
+        const body = document.body;
+
+        hamburger?.addEventListener('click', () => {
+            const open = !nav.classList.contains('open');
+            nav.classList.toggle('open', open);
+            hamburger.classList.toggle('open', open);
+            hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
+            body.classList.toggle('landing-nav-open', open);
+        });
+
+        // Close mobile nav on link click
+        nav?.querySelectorAll('.landing-nav__link').forEach(link => {
+            link.addEventListener('click', () => {
+                nav.classList.remove('open');
+                hamburger?.classList.remove('open');
+                hamburger?.setAttribute('aria-expanded', 'false');
+                body.classList.remove('landing-nav-open');
+            });
+        });
+
+        // Auth menu toggle
+        const authTrigger = document.getElementById('landing-auth-trigger');
+        const authMenu = document.getElementById('landing-auth-menu');
+
+        authTrigger?.addEventListener('click', () => {
+            const open = authMenu?.hasAttribute('hidden');
+            if (open) {
+                authMenu.removeAttribute('hidden');
+            } else {
+                authMenu?.setAttribute('hidden', 'hidden');
+            }
+            authTrigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (authTrigger && authMenu && !authTrigger.closest('.landing-auth-shell')?.contains(e.target)) {
+                authMenu.setAttribute('hidden', 'hidden');
+                authTrigger.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                authMenu?.setAttribute('hidden', 'hidden');
+                authTrigger?.setAttribute('aria-expanded', 'false');
+                nav?.classList.remove('open');
+                hamburger?.classList.remove('open');
+                hamburger?.setAttribute('aria-expanded', 'false');
+                body.classList.remove('landing-nav-open');
+            }
+        });
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('landing-navbar');
+        window.addEventListener('scroll', () => {
+            navbar?.classList.toggle('scrolled', window.scrollY > 24);
+        }, { passive: true });
+
+        // Animate elements on scroll
+        const animatedEls = document.querySelectorAll('.landing-stat-card, .landing-feature-card, .landing-arrivals');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+        animatedEls.forEach(el => observer.observe(el));
+    })();
+    </script>
+</body>
+
+</html>
