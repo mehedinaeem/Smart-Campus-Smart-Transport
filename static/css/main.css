@@ -168,6 +168,10 @@ body.mobile-menu-open {
     font-family: "Space Grotesk", sans-serif;
     font-size: 0.98rem;
     line-height: 1.1;
+    background: linear-gradient(135deg, var(--success), var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
 }
 
 .mobile-brand__copy span {
@@ -252,14 +256,14 @@ body.mobile-menu-open {
     display: grid;
     place-items: center;
     border-radius: 18px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    background: linear-gradient(135deg, var(--success), var(--primary), var(--primary-2));
     color: white;
     font-family: "Space Grotesk", sans-serif;
     font-size: 1.2rem;
     font-weight: 700;
+    box-shadow: 0 8px 24px rgba(97, 168, 255, 0.25);
 }
 
-.brand-copy h1,
 .topbar h2,
 .section-header h3,
 .spotlight-card h3,
@@ -269,6 +273,15 @@ body.mobile-menu-open {
 .alert-card h3 {
     margin: 0;
     font-family: "Space Grotesk", sans-serif;
+}
+
+.brand-copy h1 {
+    margin: 0;
+    font-family: "Space Grotesk", sans-serif;
+    background: linear-gradient(135deg, var(--success), var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
 }
 
 .brand-copy p,
